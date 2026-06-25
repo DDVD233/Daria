@@ -164,8 +164,8 @@ dev_dependencies:
     sdk: flutter
   isar_community_generator:
     git:
-      url: https://github.com/poppingmoon/isar-community
-      ref: 50983857096bac7fb14b491b606bb17d40599c6e
+      url: https://github.com/DDVD233/isar-community
+      ref: 62eceece2ba3358a0776afc7ac3f5f232da5f634
       path: packages/isar_community_generator
   json_serializable: ^6.14.0
   lint: ^2.8.0
@@ -188,8 +188,8 @@ dependency_overrides:
       path: flutter_inappwebview_macos
   isar_community:
     git:
-      url: https://github.com/poppingmoon/isar-community
-      ref: 50983857096bac7fb14b491b606bb17d40599c6e
+      url: https://github.com/DDVD233/isar-community
+      ref: 62eceece2ba3358a0776afc7ac3f5f232da5f634
       path: packages/isar_community
   jni:
     git:
