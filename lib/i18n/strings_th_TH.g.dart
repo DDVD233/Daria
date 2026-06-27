@@ -50,7 +50,7 @@ class _Translations$aria$th_TH extends Translations$aria$en_US {
 		const TextSpan(text: ' ใช่ไหม?'),
 	]);
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria กำลังได้รับการแปลเป็นภาษาต่างๆ โดยอาสาสมัคร คุณสามารถช่วยเหลือได้ที่ '),
+		const TextSpan(text: 'Daria กำลังได้รับการแปลเป็นภาษาต่างๆ โดยอาสาสมัคร คุณสามารถช่วยเหลือได้ที่ '),
 		link,
 	]);
 	@override TextSpan onlineUsersCount({required InlineSpan n}) => TextSpan(children: [

@@ -44,7 +44,7 @@ class _Translations$aria$pt_PT extends Translations$aria$en_US {
 	final TranslationsPtPt _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Sobre Aria';
+	@override String get aboutAria => 'Sobre Daria';
 	@override String get addTab => 'Adicionar aba';
 	@override String get alwaysExpandCw => 'Sempre expandir aviso de conteúdo';
 	@override String get alwaysExpandLongNote => 'Sempre expandir nota longa';
@@ -64,7 +64,7 @@ class _Translations$aria$pt_PT extends Translations$aria$en_US {
 	]);
 	@override String get guest => 'Convidado';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria é traduzido para várias línguas por voluntários. Você pode ajudar com as traduções em '),
+		const TextSpan(text: 'Daria é traduzido para várias línguas por voluntários. Você pode ajudar com as traduções em '),
 		link,
 		const TextSpan(text: '.'),
 	]);

@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,6 +39,7 @@ import 'model/account.dart';
 import 'model/id.dart';
 import 'provider/apns_push_connector_provider.dart';
 import 'provider/cache_manager_provider.dart';
+import 'provider/cupertino_theme_data_provider.dart';
 import 'provider/general_settings_notifier_provider.dart';
 import 'provider/notification_settings_repository_provider.dart';
 import 'provider/push_notification_notifier_provider.dart';
@@ -798,6 +800,12 @@ class Aria extends HookConsumerWidget {
     final router = ref.watch(routerProvider);
     final lightTheme = ref.watch(themeDataProvider(Brightness.light));
     final darkTheme = ref.watch(themeDataProvider(Brightness.dark));
+    final lightCupertinoTheme = ref.watch(
+      cupertinoThemeDataProvider(Brightness.light),
+    );
+    final darkCupertinoTheme = ref.watch(
+      cupertinoThemeDataProvider(Brightness.dark),
+    );
     final themeMode = ref.watch(
       generalSettingsNotifierProvider.select((settings) => settings.themeMode),
     );
@@ -857,7 +865,7 @@ class Aria extends HookConsumerWidget {
 
     return MaterialApp.router(
       routerConfig: router,
-      title: 'Aria',
+      title: 'Daria',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode,
@@ -865,6 +873,20 @@ class Aria extends HookConsumerWidget {
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       scrollBehavior: _AppScrollBehavior(),
+      // On iOS, layer a [CupertinoTheme] (derived from the same MisskeyColors)
+      // beneath the [MaterialApp] so the Cupertino widgets used for the native
+      // iOS UI pick up the instance's accent, background and typography. Other
+      // platforms keep the plain Material tree untouched.
+      builder: (context, child) {
+        if (child == null) return const SizedBox.shrink();
+        if (defaultTargetPlatform != TargetPlatform.iOS) return child;
+        return CupertinoTheme(
+          data: Theme.of(context).brightness == Brightness.dark
+              ? darkCupertinoTheme
+              : lightCupertinoTheme,
+          child: child,
+        );
+      },
       shortcuts: {
         ...WidgetsApp.defaultShortcuts,
         darkModeActivator: VoidCallbackIntent(() {

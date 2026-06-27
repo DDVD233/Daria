@@ -44,7 +44,7 @@ class Translations$aria$zh_TW extends Translations$aria$en_US {
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => '關於 Aria';
+	@override String get aboutAria => '關於 Daria';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		const TextSpan(text: '確定要同意 '),
 		name,
@@ -53,29 +53,33 @@ class Translations$aria$zh_TW extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => '成功更新存取權杖';
 	@override String get accountAdded => '成功添加帳戶';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria 是 '),
+		const TextSpan(text: 'Daria 是 '),
 		miria,
-		const TextSpan(text: ' 的一個分支項目。\nAria 的本地化是基於 '),
+		const TextSpan(text: ' 的一個分支項目。\nDaria 的本地化是基於 '),
 		misskey,
 		const TextSpan(text: ' 的本地化檔案。\n我們想對這些專案的所有貢獻者表示感謝。'),
 	]);
 	@override String get addTab => '添加標籤';
 	@override String get alwaysExpandCw => '始終展開敏感的媒體內容';
 	@override String get alwaysExpandLongNote => '始終展開長貼文';
+	@override String get boostWithAccount => '用此帳號轉發';
 	@override TextSpan followConfirm({required InlineSpan name}) => TextSpan(children: [
 		const TextSpan(text: '你真的要追隨'),
 		name,
 		const TextSpan(text: '嗎？'),
 	]);
+	@override String get forYou => '推薦';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria 已被志願者們翻譯成各種語言版本。您可以瀏覽 '),
+		const TextSpan(text: 'Daria 已被志願者們翻譯成各種語言版本。您可以瀏覽 '),
 		link,
 		const TextSpan(text: ' 幫助翻譯。'),
 	]);
+	@override String get likeWithAccount => '用此帳號按讚';
 	@override TextSpan onlineUsersCount({required InlineSpan n}) => TextSpan(children: [
 		n,
 		const TextSpan(text: ' 人上線'),
 	]);
+	@override String get reactWithAccount => '用此帳號回應';
 	@override TextSpan renotedBy({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: ' 轉發了'),

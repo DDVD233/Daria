@@ -55,7 +55,7 @@ class MiAuthRepository {
     final url = serverUrl.replace(
       pathSegments: ['miauth', sessionId],
       queryParameters: {
-        'name': 'Aria',
+        'name': 'Daria',
         'permission': _permissions.map((e) => e.value).join(','),
         if (defaultTargetPlatform == TargetPlatform.android)
           'callback': 'aria://aria/miauth',

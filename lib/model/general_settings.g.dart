@@ -40,7 +40,7 @@ _GeneralSettings _$GeneralSettingsFromJson(
   showQuoteButtonInNoteFooter:
       json['showQuoteButtonInNoteFooter'] as bool? ?? true,
   showLikeButtonInNoteFooter:
-      json['showLikeButtonInNoteFooter'] as bool? ?? false,
+      json['showLikeButtonInNoteFooter'] as bool? ?? true,
   showClipButtonInNoteFooter:
       json['showClipButtonInNoteFooter'] as bool? ?? false,
   showTranslateButtonInNoteFooter:
@@ -158,7 +158,7 @@ _GeneralSettings _$GeneralSettingsFromJson(
       NoteActionType.reaction,
   confirmBeforePost: json['confirmBeforePost'] as bool? ?? true,
   confirmBeforeRenote: json['confirmBeforeRenote'] as bool? ?? true,
-  confirmBeforeReact: json['confirmBeforeReact'] as bool? ?? true,
+  confirmBeforeReact: json['confirmBeforeReact'] as bool? ?? false,
   confirmBeforeFollow: json['confirmBeforeFollow'] as bool? ?? true,
   confirmBeforePostingMediaWithoutComment:
       json['confirmBeforePostingMediaWithoutComment'] as bool? ?? false,

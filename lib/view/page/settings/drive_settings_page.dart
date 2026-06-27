@@ -169,7 +169,7 @@ class DriveSettingsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.keepOriginalUploading),
                   subtitle: Text(t.misskey.keepOriginalUploadingDescription),
                   value: settings.keepOriginalUploading,
@@ -183,7 +183,7 @@ class DriveSettingsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.keepOriginalFilename),
                   subtitle: Text(t.misskey.keepOriginalFilenameDescription),
                   value: settings.keepOriginalFilename,
@@ -197,7 +197,7 @@ class DriveSettingsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.alwaysMarkSensitive),
                   value: i?.alwaysMarkNsfw ?? false,
                   onChanged: i != null
@@ -215,7 +215,7 @@ class DriveSettingsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.enableAutoSensitive),
                   subtitle: Text(t.misskey.enableAutoSensitiveDescription),
                   value: i?.autoSensitive ?? false,

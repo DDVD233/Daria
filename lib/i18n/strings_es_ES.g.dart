@@ -44,13 +44,13 @@ class _Translations$aria$es_ES extends Translations$aria$en_US {
 	final TranslationsEsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Acerca de Aria';
+	@override String get aboutAria => 'Acerca de Daria';
 	@override String get accessTokenUpdated => 'Se actualizó correctamente un token de acceso';
 	@override String get accountAdded => 'Se añadió una cuenta correctamente';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria es una fork de '),
+		const TextSpan(text: 'Daria es una fork de '),
 		miria,
-		const TextSpan(text: '.\nLas traducciones de Aria se basan en los archivos de localización de '),
+		const TextSpan(text: '.\nLas traducciones de Daria se basan en los archivos de localización de '),
 		misskey,
 		const TextSpan(text: '.\nNos gustaría mostrar nuestro agradecimiento a todos los contribuyentes de estos proyectos.'),
 	]);
@@ -114,11 +114,11 @@ class _Translations$aria$es_ES extends Translations$aria$en_US {
 	@override String get fromDevice => 'Desde el dispositivo';
 	@override String get guest => 'Invitado';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria está siendo traducido a varios idiomas gracias a voluntarios. Se puede colaborar traduciendo en '),
+		const TextSpan(text: 'Daria está siendo traducido a varios idiomas gracias a voluntarios. Se puede colaborar traduciendo en '),
 		link,
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'El icono de Aria fue creado por '),
+		const TextSpan(text: 'El icono de Daria fue creado por '),
 		sevenc_nanashi,
 		const TextSpan(text: ' y está licenciado bajo '),
 		cc_by,
@@ -199,7 +199,7 @@ class _Translations$aria$es_ES extends Translations$aria$en_US {
 		user,
 	]);
 	@override String get serverUrl => 'URL del servidor';
-	@override String get settingsFileForAria => 'Archivo de configuración para Aria';
+	@override String get settingsFileForAria => 'Archivo de configuración para Daria';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		const TextSpan(text: 'Configuración de '),
 		user,

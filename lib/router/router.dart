@@ -7,12 +7,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../i18n/strings.g.dart';
 import '../model/account.dart';
 import '../model/tab_settings.dart';
+import '../provider/accounts_notifier_provider.dart';
 import '../provider/boot_state_provider.dart';
 import '../provider/message_opened_app_notifier_provider.dart';
 import '../provider/miauth_notifier_provider.dart';
 import '../provider/push_notification_notifier_provider.dart';
 import '../provider/receive_sharing_intent_provider.dart';
 import '../provider/share_notifier_provider.dart';
+import '../provider/tos_accepted_notifier_provider.dart';
 import '../util/safe_parse_double.dart';
 import '../util/show_toast.dart';
 import '../view/page/about_aria_page.dart';
@@ -38,6 +40,7 @@ import '../view/page/favorites_page.dart';
 import '../view/page/gallery/gallery_edit_page.dart';
 import '../view/page/gallery/gallery_page.dart';
 import '../view/page/gallery/gallery_post_page.dart';
+import '../view/page/home_shell.dart';
 import '../view/page/image_page.dart';
 import '../view/page/list/list_page.dart';
 import '../view/page/list/lists_page.dart';
@@ -87,8 +90,8 @@ import '../view/page/share_page.dart';
 import '../view/page/splash_page.dart';
 import '../view/page/tag/tag_page.dart';
 import '../view/page/timeline_page.dart';
-import '../view/page/timelines_page.dart';
 import '../view/page/token_login_page.dart';
+import '../view/page/tos_page.dart';
 import '../view/page/user/followers_page.dart';
 import '../view/page/user/following_page.dart';
 import '../view/page/user/user_list_page.dart';
@@ -115,9 +118,14 @@ GoRouter router(Ref ref) {
         redirect: (_, _) {
           if (!bootState.hasValue || bootState.value == null) {
             return null;
-          } else {
-            return '/timelines';
           }
+          if (ref.read(accountsNotifierProvider).isEmpty) {
+            return '/login';
+          }
+          if (!ref.read(tosAcceptedNotifierProvider)) {
+            return '/tos';
+          }
+          return '/home';
         },
       ),
       GoRoute(path: '/about-aria', builder: (_, _) => const AboutAriaPage()),
@@ -128,7 +136,7 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/login',
         builder: (_, state) =>
-            LoginPage(query: state.uri.queryParameters['query']),
+            LoginPage(query: state.uri.queryParameters['query'] ?? 'dvd.chat'),
         routes: [
           GoRoute(
             path: 'authenticate',
@@ -154,7 +162,7 @@ GoRouter router(Ref ref) {
             );
           }
           if (result.success) {
-            return '/timelines';
+            return '/home';
           } else {
             return '/login/authenticate';
           }
@@ -302,10 +310,39 @@ GoRouter router(Ref ref) {
         ],
       ),
       GoRoute(path: '/share', builder: (_, _) => const SharePage()),
-      GoRoute(path: '/timelines', builder: (_, _) => const TimelinesPage()),
+      GoRoute(
+        path: '/home',
+        builder: (_, _) => const HomeShell(),
+        redirect: (_, _) {
+          if (!bootState.hasValue || bootState.value == null) {
+            return null;
+          }
+          if (ref.read(accountsNotifierProvider).isEmpty) {
+            return '/login';
+          }
+          if (!ref.read(tosAcceptedNotifierProvider)) {
+            return '/tos';
+          }
+          return null;
+        },
+      ),
+      GoRoute(
+        path: '/tos',
+        builder: (_, _) => const TosPage(),
+        redirect: (_, _) {
+          if (!bootState.hasValue || bootState.value == null) {
+            return null;
+          }
+          if (ref.read(accountsNotifierProvider).isEmpty) {
+            return '/login';
+          }
+          return ref.read(tosAcceptedNotifierProvider) ? '/home' : null;
+        },
+      ),
+      GoRoute(path: '/timelines', builder: (_, _) => const HomeShell()),
       GoRoute(
         path: '/:acct',
-        builder: (_, _) => const TimelinesPage(),
+        builder: (_, _) => const HomeShell(),
         routes: [
           GoRoute(
             path: '@:username@:host',
@@ -670,14 +707,6 @@ GoRouter router(Ref ref) {
               account: Account.fromString(state.pathParameters['acct']!),
               tag: state.pathParameters['tag']!,
               initialIndex: state.uri.fragment == 'users' ? 1 : 0,
-            ),
-          ),
-          GoRoute(
-            path: 'timeline/global',
-            builder: (_, state) => TimelinePage(
-              tabSettings: TabSettings.globalTimeline(
-                Account.fromString(state.pathParameters['acct']!),
-              ),
             ),
           ),
           GoRoute(

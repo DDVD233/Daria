@@ -9,6 +9,7 @@ import '../../provider/accounts_notifier_provider.dart';
 import '../../provider/push_subscription_notifier_provider.dart';
 import '../../provider/timeline_tabs_notifier_provider.dart';
 import '../../util/future_with_dialog.dart';
+import '../../util/launch_url.dart';
 import '../dialog/confirmation_dialog.dart';
 
 enum AccountSettingsDestination {
@@ -19,6 +20,7 @@ enum AccountSettingsDestination {
   notifications,
   muteBlock,
   signOut,
+  deleteAccount,
 }
 
 class AccountSettingsNavigation extends ConsumerWidget {
@@ -48,6 +50,7 @@ class AccountSettingsNavigation extends ConsumerWidget {
       ),
       AccountSettingsDestination.muteBlock => const Icon(Icons.block),
       AccountSettingsDestination.signOut => const Icon(Icons.logout),
+      AccountSettingsDestination.deleteAccount => const Icon(Icons.no_accounts),
     };
   }
 
@@ -60,8 +63,13 @@ class AccountSettingsNavigation extends ConsumerWidget {
       AccountSettingsDestination.notifications => t.misskey.notifications,
       AccountSettingsDestination.muteBlock => t.misskey.muteAndBlock,
       AccountSettingsDestination.signOut => t.misskey.logout,
+      AccountSettingsDestination.deleteAccount => t.aria.deleteAccount,
     };
   }
+
+  bool _isDestructive(AccountSettingsDestination destination) =>
+      destination == AccountSettingsDestination.signOut ||
+      destination == AccountSettingsDestination.deleteAccount;
 
   Future<void> _onTap(
     WidgetRef ref,
@@ -102,6 +110,14 @@ class AccountSettingsNavigation extends ConsumerWidget {
       if (selectedDestination != null && ref.context.canPop()) {
         ref.context.pop();
       }
+    } else if (destination == AccountSettingsDestination.deleteAccount) {
+      final confirmed = await confirm(
+        ref.context,
+        message: t.aria.deleteAccountConfirm,
+      );
+      if (!confirmed) return;
+      if (!ref.context.mounted) return;
+      await launchUrl(ref, Uri.https(account.host, '/settings/other'));
     } else {
       final location = switch (destination) {
         AccountSettingsDestination.profile =>
@@ -115,7 +131,8 @@ class AccountSettingsNavigation extends ConsumerWidget {
           '/settings/accounts/$account/notifications',
         AccountSettingsDestination.muteBlock =>
           '/settings/accounts/$account/mute-block',
-        AccountSettingsDestination.signOut => throw UnsupportedError(
+        AccountSettingsDestination.signOut ||
+        AccountSettingsDestination.deleteAccount => throw UnsupportedError(
           'unreachable',
         ),
       };
@@ -139,8 +156,7 @@ class AccountSettingsNavigation extends ConsumerWidget {
                 ? IconButtonTheme(
                     data: IconButtonThemeData(
                       style: IconButton.styleFrom(
-                        foregroundColor:
-                            destination == AccountSettingsDestination.signOut
+                        foregroundColor: _isDestructive(destination)
                             ? Theme.of(context).colorScheme.error
                             : null,
                         disabledForegroundColor: Theme.of(
@@ -177,10 +193,10 @@ class AccountSettingsNavigation extends ConsumerWidget {
                         ? () => _onTap(ref, destination)
                         : null,
                     selected: destination == selectedDestination,
-                    iconColor: destination == AccountSettingsDestination.signOut
+                    iconColor: _isDestructive(destination)
                         ? Theme.of(context).colorScheme.error
                         : null,
-                    textColor: destination == AccountSettingsDestination.signOut
+                    textColor: _isDestructive(destination)
                         ? Theme.of(context).colorScheme.error
                         : null,
                   ),

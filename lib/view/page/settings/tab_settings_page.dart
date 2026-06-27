@@ -355,10 +355,9 @@ class TabSettingsPage extends HookConsumerWidget {
                             TabType.hybridTimeline =>
                               !(account.value?.isGuest ?? true) &&
                                   (i?.policies?.ltlAvailable ?? true),
-                            TabType.globalTimeline =>
-                              account.value?.isGuest ?? true
-                                  ? meta?.policies?.gtlAvailable ?? true
-                                  : i?.policies?.gtlAvailable ?? true,
+                            // Global timeline removed: federated content is
+                            // unmoderated, so it is not offered as a tab type.
+                            TabType.globalTimeline => false,
                             TabType.channel ||
                             TabType.hashtag ||
                             TabType.user ||
@@ -880,7 +879,7 @@ class TabSettingsPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.disableStreamingTimeline),
                         value: tabSettings.value.disableStreaming,
                         onChanged: (value) => tabSettings.value = tabSettings
@@ -893,7 +892,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.aria.disableSubscribingNotes),
                       value: tabSettings.value.disableSubscribing,
                       onChanged: (value) => tabSettings.value = tabSettings
@@ -910,7 +909,7 @@ class TabSettingsPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.showRepliesToOthersInTimeline),
                         value: tabSettings.value.withReplies,
                         onChanged: (value) => tabSettings.value = tabSettings
@@ -923,7 +922,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.misskey.showRenotes),
                       value: tabSettings.value.withRenotes,
                       onChanged: (value) => tabSettings.value = tabSettings
@@ -936,7 +935,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.aria.showSelfRenotes),
                       value: tabSettings.value.withSelfRenotes,
                       onChanged: (value) => tabSettings.value = tabSettings
@@ -949,7 +948,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.misskey.fileAttachedOnly),
                       value: tabSettings.value.withFiles,
                       onChanged: (value) => tabSettings.value = tabSettings
@@ -962,7 +961,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.misskey.withSensitive),
                       value: tabSettings.value.withSensitive,
                       onChanged: (value) => tabSettings.value = tabSettings
@@ -982,7 +981,7 @@ class TabSettingsPage extends HookConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.aria.keepTimelinePosition),
                       value: tabSettings.value.keepPosition,
                       onChanged: (value) => tabSettings.value = tabSettings

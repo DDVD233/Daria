@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:misskey_dart/misskey_dart.dart';
 
 import '../../constant/inifite_scroll_extent_threshold.dart';
 import '../../constant/max_content_width.dart';
@@ -24,6 +23,7 @@ import '../../provider/timeline_center_notifier_provider.dart';
 import '../../provider/timeline_last_viewed_note_id_notifier_provider.dart';
 import '../../provider/timeline_notes_queue_notifier_provider.dart';
 import '../../provider/timeline_scroll_controller_provider.dart';
+import '../../util/group_notes_into_threads.dart';
 import '../../util/reload_timeline.dart';
 import 'haptic_feedback_refresh_indicator.dart';
 import 'notifications_list_view.dart';
@@ -44,70 +44,44 @@ class TimelineListView extends HookConsumerWidget {
   final void Function()? focusPostForm;
   final Key? lastViewedAtKey;
 
+  /// Computes where to place the "new notes" divider in the reordered
+  /// (threaded) display lists.
+  ///
+  /// The divider is placed between whole thread/standalone *units* (never
+  /// inside a thread): above the newest unit whose leaf note has already been
+  /// seen (`leaf.id <= lastViewedNoteId`), provided a not-yet-seen unit sits
+  /// above it. The returned index matches the encoding consumed by the slivers:
+  /// a positive value `i` puts the divider in the `nextNotes` sliver between
+  /// display items `i - 1` and `i`, `0` puts it at the center pivot, and a
+  /// negative value `-d` puts it in the `previousNotes` sliver above display
+  /// item `d`. Returns `null` when no divider should be shown.
   @visibleForTesting
-  int? getNewNoteDividerIndex({
-    required String lastViewedNoteId,
-    List<Note>? nextNotes,
-    List<Note>? previousNotes,
-    int? newNoteDividerIndex,
+  int? computeNewNotesDividerIndex({
+    required String? lastViewedNoteId,
+    required List<DisplayNote> nextDisplay,
+    required List<DisplayNote> previousDisplay,
   }) {
-    if (nextNotes != null) {
-      final oldestNextNoteId = nextNotes.lastOrNull?.id;
-      final latestNextNoteId = nextNotes.firstOrNull?.id;
-      if (latestNextNoteId != null && oldestNextNoteId != null) {
-        if (oldestNextNoteId.compareTo(lastViewedNoteId) <= 0) {
-          if (lastViewedNoteId.compareTo(latestNextNoteId) < 0) {
-            if (newNoteDividerIndex case final newNoteDividerIndex?
-                when newNoteDividerIndex < 0) {
-              final index = -newNoteDividerIndex - 1;
-              if (nextNotes.elementAtOrNull(index + 1)?.id
-                  case final previousNoteId?
-                  when previousNoteId.compareTo(lastViewedNoteId) <= 0) {
-                if (nextNotes.elementAtOrNull(index)?.id case final nextNoteId?
-                    when lastViewedNoteId.compareTo(nextNoteId) < 0) {
-                  return newNoteDividerIndex;
-                }
-              }
-            }
-            final index = nextNotes.lastIndexWhere(
-              (note) => lastViewedNoteId.compareTo(note.id) < 0,
-            );
-            if (0 <= index && index < nextNotes.length - 1) {
-              return nextNotes.length - index - 1;
-            }
-          }
-        } else if (previousNotes?.firstOrNull?.id
-            case final latestPreviousNoteId?
-            when latestPreviousNoteId.compareTo(lastViewedNoteId) <= 0) {
-          return 0;
-        }
-      }
+    if (lastViewedNoteId == null) {
+      return null;
     }
-    if (previousNotes != null) {
-      if (previousNotes.lastOrNull?.id case final oldestPreviousNoteId?
-          when oldestPreviousNoteId.compareTo(lastViewedNoteId) <= 0) {
-        if (previousNotes.firstOrNull?.id case final latestPreviousNoteId?
-            when lastViewedNoteId.compareTo(latestPreviousNoteId) < 0) {
-          if (newNoteDividerIndex case final newNoteDividerIndex?
-              when newNoteDividerIndex > 0) {
-            final index = newNoteDividerIndex - 1;
-            if (previousNotes.elementAtOrNull(index + 1)?.id
-                case final previousNoteId?
-                when previousNoteId.compareTo(lastViewedNoteId) <= 0) {
-              if (previousNotes.elementAtOrNull(index)?.id
-                  case final nextNoteId?
-                  when lastViewedNoteId.compareTo(nextNoteId) < 0) {
-                return newNoteDividerIndex;
-              }
-            }
+    final combined = [...nextDisplay, ...previousDisplay];
+    final nextLength = nextDisplay.length;
+    int? unitStart;
+    var sawNewUnit = false;
+    for (var i = 0; i < combined.length; i++) {
+      final displayNote = combined[i];
+      if (!displayNote.connectTop) {
+        unitStart = i;
+      }
+      if (!displayNote.connectBottom) {
+        // End of the current unit; its leaf note is the newest in the unit.
+        if (displayNote.note.id.compareTo(lastViewedNoteId) <= 0) {
+          if (sawNewUnit && unitStart != null) {
+            return nextLength - unitStart;
           }
-          final index = previousNotes.lastIndexWhere(
-            (note) => lastViewedNoteId.compareTo(note.id) < 0,
-          );
-          if (0 <= index && index < previousNotes.length - 1) {
-            return -index - 1;
-          }
+          return null;
         }
+        sawNewUnit = true;
       }
     }
     return null;
@@ -147,9 +121,21 @@ class TimelineListView extends HookConsumerWidget {
     final previousNotes = ref.watch(
       timelineNotesNotifierProvider(tabSettings, untilId: untilId),
     );
-    final partialPreviousNoteIds =
-        previousNotes.value?.items.take(5).map((note) => note.id) ?? [];
+    final partialPreviousNoteIds = {
+      ...?previousNotes.value?.items.take(5).map((note) => note.id),
+    };
     final hasPreviousNote = partialPreviousNoteIds.isNotEmpty;
+    // Group reply chains present within each loaded segment into threads. The
+    // two segments are grouped independently so neither crosses the center
+    // pivot that keeps the scroll position stable.
+    final nextDisplay = useMemoized(
+      () => orderTimelineForThreads(nextNotes.value?.items ?? const []),
+      [nextNotes.value?.items],
+    );
+    final previousDisplay = useMemoized(
+      () => orderTimelineForThreads(previousNotes.value?.items ?? const []),
+      [previousNotes.value?.items],
+    );
     final (showGap, showPopup) = ref.watch(
       generalSettingsNotifierProvider.select(
         (settings) => (
@@ -158,21 +144,11 @@ class TimelineListView extends HookConsumerWidget {
         ),
       ),
     );
-    final newNoteDividerIndex = useState<int?>(null);
-    useEffect(() {
-      if (lastViewedNoteId != null) {
-        final index = getNewNoteDividerIndex(
-          lastViewedNoteId: lastViewedNoteId,
-          nextNotes: nextNotes.value?.items,
-          previousNotes: previousNotes.value?.items,
-          newNoteDividerIndex: newNoteDividerIndex.value,
-        );
-        if (index != null) {
-          newNoteDividerIndex.value = index;
-        }
-      }
-      return;
-    }, [tabSettings, nextNotes.value?.items, previousNotes.value?.items]);
+    final newNoteDividerIndex = computeNewNotesDividerIndex(
+      lastViewedNoteId: lastViewedNoteId,
+      nextDisplay: nextDisplay,
+      previousDisplay: previousDisplay,
+    );
     final keepAnimation = useRef(true);
     final scrollingFrom = useRef<double?>(null);
     final scrollingTo = useRef<double?>(null);
@@ -446,16 +422,20 @@ class TimelineListView extends HookConsumerWidget {
                   ),
                 ),
               ),
-              if (nextNotes.value?.items case final notes?)
+              if (nextNotes.value != null)
                 SliverList.separated(
                   itemBuilder: (context, index) {
-                    final note = notes[notes.length - index - 1];
-                    final isTop = index == notes.length - 1;
+                    final displayNote =
+                        nextDisplay[nextDisplay.length - index - 1];
+                    final note = displayNote.note;
+                    final connectTop = displayNote.connectTop;
+                    final connectBottom = displayNote.connectBottom;
+                    final isTop = index == nextDisplay.length - 1;
                     final isBottom = index == 0 && !hasPreviousNote;
                     final (
                       isBelowNewNote,
                       isAboveNewNote,
-                    ) = switch (newNoteDividerIndex.value) {
+                    ) = switch (newNoteDividerIndex) {
                       final i? => (index == i - 1, index == i),
                       _ => (false, false),
                     };
@@ -484,41 +464,61 @@ class TimelineListView extends HookConsumerWidget {
                           tabSettings: tabSettings,
                           noteId: note.id,
                           focusPostForm: focusPostForm,
+                          connectTop: connectTop,
+                          connectBottom: connectBottom,
                           margin: showGap
-                              ? const EdgeInsets.symmetric(vertical: 4.0)
+                              ? EdgeInsets.only(
+                                  top: connectTop ? 0.0 : 4.0,
+                                  bottom: connectBottom ? 0.0 : 4.0,
+                                )
                               : EdgeInsets.zero,
                           borderRadius: showGap
-                              ? BorderRadius.circular(8.0)
+                              ? BorderRadius.vertical(
+                                  top: connectTop
+                                      ? Radius.zero
+                                      : const Radius.circular(8.0),
+                                  bottom: connectBottom
+                                      ? Radius.zero
+                                      : const Radius.circular(8.0),
+                                )
                               : BorderRadius.vertical(
-                                  top: isTop || isBelowNewNote
+                                  top: (isTop || isBelowNewNote) && !connectTop
                                       ? const Radius.circular(8.0)
                                       : Radius.zero,
-                                  bottom: isBottom || isAboveNewNote
+                                  bottom:
+                                      (isBottom || isAboveNewNote) &&
+                                          !connectBottom
                                       ? const Radius.circular(8.0)
                                       : Radius.zero,
                                 ),
-                          hide:
-                              index < 5 &&
-                              partialPreviousNoteIds.contains(note.id),
+                          hide: partialPreviousNoteIds.contains(note.id),
                           listViewKey: centerKey,
                         ),
                       ),
                     );
                   },
-                  separatorBuilder: (context, index) => !showGap
-                      ? Center(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                            width: maxContentWidth,
-                            child:
-                                newNoteDividerIndex.value != null &&
-                                    index == newNoteDividerIndex.value! - 1
-                                ? _NewNotesDivider(key: lastViewedAtKey)
-                                : const Divider(height: 1.0),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                  itemCount: notes.length,
+                  separatorBuilder: (context, index) {
+                    if (showGap) {
+                      return const SizedBox.shrink();
+                    }
+                    // No divider between two connected thread members.
+                    if (nextDisplay[nextDisplay.length - index - 1]
+                        .connectTop) {
+                      return const SizedBox.shrink();
+                    }
+                    return Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        width: maxContentWidth,
+                        child:
+                            newNoteDividerIndex != null &&
+                                index == newNoteDividerIndex - 1
+                            ? _NewNotesDivider(key: lastViewedAtKey)
+                            : const Divider(height: 1.0),
+                      ),
+                    );
+                  },
+                  itemCount: nextDisplay.length,
                 ),
               SliverToBoxAdapter(
                 key: centerKey,
@@ -527,7 +527,7 @@ class TimelineListView extends HookConsumerWidget {
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 8.0),
                           width: maxContentWidth,
-                          child: newNoteDividerIndex.value == 0
+                          child: newNoteDividerIndex == 0
                               ? _NewNotesDivider(key: lastViewedAtKey)
                               : !showGap
                               ? const Divider(height: 1.0)
@@ -536,16 +536,19 @@ class TimelineListView extends HookConsumerWidget {
                       )
                     : null,
               ),
-              if (previousNotes.value?.items case final notes?)
+              if (previousNotes.value != null)
                 SliverList.separated(
                   itemBuilder: (context, index) {
-                    final note = notes[index];
+                    final displayNote = previousDisplay[index];
+                    final note = displayNote.note;
+                    final connectTop = displayNote.connectTop;
+                    final connectBottom = displayNote.connectBottom;
                     final isTop = index == 0 && !hasNextNote;
-                    final isBottom = index == notes.length - 1;
+                    final isBottom = index == previousDisplay.length - 1;
                     final (
                       isBelowNewNote,
                       isAboveNewNote,
-                    ) = switch (newNoteDividerIndex.value) {
+                    ) = switch (newNoteDividerIndex) {
                       final i? => (index == -i, index == -i - 1),
                       _ => (false, false),
                     };
@@ -574,16 +577,30 @@ class TimelineListView extends HookConsumerWidget {
                           tabSettings: tabSettings,
                           noteId: note.id,
                           focusPostForm: focusPostForm,
+                          connectTop: connectTop,
+                          connectBottom: connectBottom,
                           margin: showGap
-                              ? const EdgeInsets.symmetric(vertical: 4.0)
+                              ? EdgeInsets.only(
+                                  top: connectTop ? 0.0 : 4.0,
+                                  bottom: connectBottom ? 0.0 : 4.0,
+                                )
                               : EdgeInsets.zero,
                           borderRadius: showGap
-                              ? BorderRadius.circular(8.0)
+                              ? BorderRadius.vertical(
+                                  top: connectTop
+                                      ? Radius.zero
+                                      : const Radius.circular(8.0),
+                                  bottom: connectBottom
+                                      ? Radius.zero
+                                      : const Radius.circular(8.0),
+                                )
                               : BorderRadius.vertical(
-                                  top: isTop || isBelowNewNote
+                                  top: (isTop || isBelowNewNote) && !connectTop
                                       ? const Radius.circular(8.0)
                                       : Radius.zero,
-                                  bottom: isBottom || isAboveNewNote
+                                  bottom:
+                                      (isBottom || isAboveNewNote) &&
+                                          !connectBottom
                                       ? const Radius.circular(8.0)
                                       : Radius.zero,
                                 ),
@@ -592,20 +609,27 @@ class TimelineListView extends HookConsumerWidget {
                       ),
                     );
                   },
-                  separatorBuilder: (context, index) => !showGap
-                      ? Center(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                            width: maxContentWidth,
-                            child:
-                                newNoteDividerIndex.value != null &&
-                                    index == -newNoteDividerIndex.value! - 1
-                                ? _NewNotesDivider(key: lastViewedAtKey)
-                                : const Divider(height: 0.0),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                  itemCount: notes.length,
+                  separatorBuilder: (context, index) {
+                    if (showGap) {
+                      return const SizedBox.shrink();
+                    }
+                    // No divider between two connected thread members.
+                    if (previousDisplay[index + 1].connectTop) {
+                      return const SizedBox.shrink();
+                    }
+                    return Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        width: maxContentWidth,
+                        child:
+                            newNoteDividerIndex != null &&
+                                index == -newNoteDividerIndex - 1
+                            ? _NewNotesDivider(key: lastViewedAtKey)
+                            : const Divider(height: 0.0),
+                      ),
+                    );
+                  },
+                  itemCount: previousDisplay.length,
                 ),
               SliverToBoxAdapter(
                 child: Center(

@@ -56,7 +56,7 @@ class BehaviorPage extends HookConsumerWidget {
     );
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.behavior)),
+      title: Text(t.misskey.behavior),
       body: ListTileTheme(
         data: ListTileThemeData(
           tileColor: Theme.of(context).colorScheme.surface,
@@ -68,7 +68,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.enableInfiniteScroll),
                   value: settings.enableInfiniteScroll,
                   onChanged: (value) => ref
@@ -86,7 +86,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.keepScreenOn),
                   value: settings.keepScreenOn,
                   onChanged: (value) {
@@ -102,7 +102,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.openSensitiveMediaOnDoubleTap),
                   value: settings.openSensitiveMediaOnDoubleTap,
                   onChanged: (value) => ref
@@ -220,7 +220,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.confirmBeforePost),
                   value: settings.confirmBeforePost,
                   onChanged: (value) => ref
@@ -233,7 +233,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.confirmBeforeRenote),
                   value: settings.confirmBeforeRenote,
                   onChanged: (value) => ref
@@ -246,7 +246,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.confirmBeforeReact),
                   value: settings.confirmBeforeReact,
                   onChanged: (value) => ref
@@ -259,7 +259,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.confirmBeforeFollow),
                   value: settings.confirmBeforeFollow,
                   onChanged: (value) => ref
@@ -272,7 +272,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.confirmBeforePostingMediaWithoutComment),
                   value: settings.confirmBeforePostingMediaWithoutComment,
                   onChanged: (value) => ref
@@ -285,7 +285,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.confirmWhenRevealingSensitiveMedia),
                   value: settings.confirmWhenRevealingSensitiveMedia,
                   onChanged: (value) => ref
@@ -348,7 +348,7 @@ class BehaviorPage extends HookConsumerWidget {
                       context,
                       title: Text(t.aria.mediaSaveLocation),
                       initialText: settings.mediaSaveLocation,
-                      decoration: const InputDecoration(hintText: 'Aria'),
+                      decoration: const InputDecoration(hintText: 'Daria'),
                     );
                     if (result != null) {
                       await ref
@@ -375,7 +375,7 @@ class BehaviorPage extends HookConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.aria.enableSpellCheck),
                     value: settings.enableSpellCheck,
                     onChanged: (value) => ref
@@ -398,7 +398,7 @@ class BehaviorPage extends HookConsumerWidget {
                   width: maxContentWidth,
                   child: FutureBuilder(
                     future: DeviceInfoPlugin().androidInfo,
-                    builder: (context, snapshot) => SwitchListTile(
+                    builder: (context, snapshot) => SwitchListTile.adaptive(
                       title: Text(t.aria.enablePredictiveBack),
                       value: settings.enablePredictiveBack,
                       onChanged: switch (snapshot.data?.version.sdkInt) {
@@ -434,7 +434,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.enableHorizontalSwipe),
                   value: settings.enableHorizontalSwipe,
                   onChanged: (value) => ref
@@ -546,7 +546,7 @@ class BehaviorPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.enableHapticFeedback),
                   value: settings.enableHapticFeedback,
                   onChanged: (value) => ref

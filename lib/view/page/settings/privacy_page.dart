@@ -52,7 +52,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.makeFollowManuallyApprove),
                     subtitle: Text(t.misskey.lockedAccountInfo),
                     value: i.isLocked,
@@ -75,7 +75,7 @@ class PrivacyPage extends ConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.misskey.autoAcceptFollowed),
                       value: i.autoAcceptFollowed,
                       onChanged: (value) => futureWithDialog(
@@ -91,7 +91,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.makeReactionsPublic),
                     subtitle: Text(t.misskey.makeReactionsPublicDescription),
                     value: i.publicReactions,
@@ -172,7 +172,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.hideOnlineStatus),
                     subtitle: Text(t.misskey.hideOnlineStatusDescription),
                     value: i.hideOnlineStatus,
@@ -189,7 +189,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.noCrawle),
                     subtitle: Text(t.misskey.noCrawleDescription),
                     value: i.noCrawle,
@@ -207,7 +207,7 @@ class PrivacyPage extends ConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       title: Text(t.misskey.preventAiLearning),
                       subtitle: Text(t.misskey.preventAiLearningDescription),
                       value: preventAiLearning,
@@ -224,7 +224,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.makeExplorable),
                     subtitle: Text(t.misskey.makeExplorableDescription),
                     value: i.isExplorable,
@@ -319,7 +319,7 @@ class PrivacyPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.keepCw),
                   value: settings.keepCw,
                   onChanged: (value) => ref
@@ -337,7 +337,7 @@ class PrivacyPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.rememberNoteVisibility),
                   value: settings.rememberNoteVisibility,
                   onChanged: (value) => ref
@@ -385,7 +385,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.misskey.visibility_.disableFederation),
                     subtitle: Text(t.misskey.disableFederationConfirmWarn),
                     value: settings.defaultNoteLocalOnly,
@@ -400,7 +400,7 @@ class PrivacyPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(
                     '${t.misskey.rememberNoteVisibility} (${t.misskey.renote})',
                   ),
@@ -454,7 +454,7 @@ class PrivacyPage extends ConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(
                       '${t.misskey.visibility_.disableFederation} (${t.misskey.renote})',
                     ),

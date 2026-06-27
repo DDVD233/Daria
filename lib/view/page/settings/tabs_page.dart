@@ -22,7 +22,7 @@ class TabsPage extends HookConsumerWidget {
 
     return GeneralSettingsScaffold(
       selectedDestination: GeneralSettingsDestination.tabs,
-      appBar: AppBar(title: Text(t.aria.tabs)),
+      title: Text(t.aria.tabs),
       body: tabs.isEmpty
           ? Center(child: Text(t.aria.noTabs))
           : ListTileTheme(

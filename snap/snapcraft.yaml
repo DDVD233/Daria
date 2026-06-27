@@ -1,15 +1,15 @@
 name: aria
 version: git
-title: Aria for Misskey
+title: Daria for Misskey
 summary: Dive into the interplanetary microblogging platform 🚀
 description: |
-  Aria is a client app for Misskey, a federated social media platform.
+  Daria is a client app for Misskey, a federated social media platform.
 
   Supports most of Misskey's features
-  Aria supports most of the functions available in Misskey, including viewing various types of timelines, posting notes, editing clips, lists or antennas, etc.
+  Daria supports most of the functions available in Misskey, including viewing various types of timelines, posting notes, editing clips, lists or antennas, etc.
 
   Swipe to switch between multiple accounts (of multiple servers)
-  Aria makes it easy to view different timelines by saving the timelines you want to view as tabs. Adding any account's timeline to a tab makes it easy to follow topics across servers.
+  Daria makes it easy to view different timelines by saving the timelines you want to view as tabs. Adding any account's timeline to a tab makes it easy to follow topics across servers.
 
   Based on the design of the official Misskey Web client
   The user interface is designed to look familiar, similar to the official Misskey front-end. It also supports note decoration with MFM.

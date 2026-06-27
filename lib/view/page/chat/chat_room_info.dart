@@ -209,7 +209,7 @@ class ChatRoomInfo extends ConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     width: maxContentWidth,
-                    child: SwitchListTile(
+                    child: SwitchListTile.adaptive(
                       secondary: const Icon(Icons.visibility_off),
                       title: Text(t.misskey.chat_.muteThisRoom),
                       value: room.isMuted ?? false,

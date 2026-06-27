@@ -370,7 +370,7 @@ class AsUiWidget extends HookConsumerWidget {
         ),
       ):
         final value = useState(defaultValue);
-        return SwitchListTile(
+        return SwitchListTile.adaptive(
           value: value.value ?? false,
           title: label != null ? Text(label) : null,
           subtitle: caption != null

@@ -1,5 +1,5 @@
 followConfirm(rich): "ต้องการติดตาม {name} ใช่ไหม?"
-i18nInfo(rich): "Aria กำลังได้รับการแปลเป็นภาษาต่างๆ โดยอาสาสมัคร คุณสามารถช่วยเหลือได้ที่ {link}"
+i18nInfo(rich): "Daria กำลังได้รับการแปลเป็นภาษาต่างๆ โดยอาสาสมัคร คุณสามารถช่วยเหลือได้ที่ {link}"
 onlineUsersCount(rich): "{n} รายกำลังออนไลน์"
 renotedBy(rich): "รีโน้ตโดย {user}"
 unfollowConfirm(rich): "ต้องการเลิกติดตาม {name} ใช่ไหม?"

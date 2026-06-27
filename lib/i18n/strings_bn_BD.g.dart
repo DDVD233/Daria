@@ -49,7 +49,7 @@ class _Translations$aria$bn_BD extends Translations$aria$en_US {
 		const TextSpan(text: ' কে ফলোও করার ব্যাপারে নিশ্চিত?'),
 	]);
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria স্বেচ্ছাসেবকদের দ্বারা বিভিন্ন ভাষায় অনুবাদ করা হচ্ছে। আপনি '),
+		const TextSpan(text: 'Daria স্বেচ্ছাসেবকদের দ্বারা বিভিন্ন ভাষায় অনুবাদ করা হচ্ছে। আপনি '),
 		link,
 		const TextSpan(text: ' এ গিয়ে অনুবাদে সহযোগিতা করতে পারেন।'),
 	]);

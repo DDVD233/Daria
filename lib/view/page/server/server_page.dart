@@ -59,12 +59,6 @@ class ServerPage extends HookConsumerWidget {
                     title: Text(t.misskey.timelines_.local),
                     onTap: () => context.push('/$host/timeline/local'),
                   ),
-                if (meta.policies?.gtlAvailable ?? true)
-                  ListTile(
-                    leading: const Icon(Icons.public),
-                    title: Text(t.misskey.timelines_.global),
-                    onTap: () => context.push('/$host/timeline/global'),
-                  ),
                 ListTile(
                   leading: const Icon(Icons.tag),
                   title: Text(t.misskey.explore),

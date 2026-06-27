@@ -45,7 +45,7 @@ class Translations$aria$ko_GS extends Translations$aria$en_US {
 	final TranslationsKoGs _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Aria라 카믄';
+	@override String get aboutAria => 'Daria라 카믄';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		name,
 		const TextSpan(text: '한테서 온 팔로우 리퀘스트 참말로 수락하는거 맞나?'),
@@ -120,12 +120,12 @@ class Translations$aria$ko_GS extends Translations$aria$en_US {
 	@override String get fromDevice => '장치에서';
 	@override String get guest => '손님';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria는 이래저래 고마운 분들이 여럿 번역해 주고 있다야... '),
+		const TextSpan(text: 'Daria는 이래저래 고마운 분들이 여럿 번역해 주고 있다야... '),
 		link,
 		const TextSpan(text: '에서 쪼금만 도와 주지 않겄나?'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Aria의 아이콘은 '),
+		const TextSpan(text: 'Daria의 아이콘은 '),
 		sevenc_nanashi,
 		const TextSpan(text: '가 그맀고, '),
 		cc_by,
@@ -199,7 +199,7 @@ class Translations$aria$ko_GS extends Translations$aria$en_US {
 		const TextSpan(text: '님이 지 껄 리노트했다야'),
 	]);
 	@override String get serverUrl => '써버 URL';
-	@override String get settingsFileForAria => 'Aria 설정 파일';
+	@override String get settingsFileForAria => 'Daria 설정 파일';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: ' 설정'),

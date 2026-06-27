@@ -1,5 +1,4 @@
 import Foundation
-import Security
 
 public enum NotificationSettingsStorageError: Error {
   case save
@@ -8,75 +7,28 @@ public enum NotificationSettingsStorageError: Error {
 }
 
 public struct NotificationSettingsStorage {
-  private static let service = "web_push_key_set"
   private static let group =
-    "group.com.poppingmoon.aria.Notification-Service-Extension"
+    "group.chat.dvd.Daria.Notification-Service-Extension"
+
+  // The Web Push key set is shared with the Notification Service Extension via
+  // the app group's shared UserDefaults. A keychain access group keyed on the
+  // app group does not reliably share keychain items between the host app and
+  // the extension, so the extension could not read the key set to decrypt
+  // notifications.
+  private static func keySetKey(_ account: String) -> String {
+    "webPushKeySet/\(account)"
+  }
 
   public static func saveKeySet(account: String, keySet: String) throws {
-    let data = Data(keySet.utf8)
-    let query =
-      [
-        kSecClass: kSecClassGenericPassword,
-        kSecAttrService: service,
-        kSecAttrAccount: account,
-        kSecAttrAccessGroup: group,
-        kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
-        kSecValueData: data,
-      ] as CFDictionary
-    let status = SecItemAdd(query, nil)
-    switch status {
-    case errSecSuccess:
-      return
-    case errSecDuplicateItem:
-      let status = SecItemUpdate(query, [kSecValueData: data] as CFDictionary)
-      if status == errSecSuccess {
-        return
-      }
-      fallthrough
-    default:
-      throw NotificationSettingsStorageError.save
-    }
+    UserDefaults(suiteName: group)?.set(keySet, forKey: keySetKey(account))
   }
 
   public static func loadKeySet(account: String) throws -> String? {
-    let query =
-      [
-        kSecClass: kSecClassGenericPassword,
-        kSecAttrService: service,
-        kSecAttrAccount: account,
-        kSecAttrAccessGroup: group,
-        kSecReturnData: true,
-      ] as CFDictionary
-    var item: CFTypeRef?
-    let status = SecItemCopyMatching(query, &item)
-    switch status {
-    case errSecSuccess:
-      guard let data = item as? Data else {
-        return nil
-      }
-      return String(data: data, encoding: String.Encoding.utf8)
-    case errSecItemNotFound:
-      return nil
-    default:
-      throw NotificationSettingsStorageError.load
-    }
+    UserDefaults(suiteName: group)?.string(forKey: keySetKey(account))
   }
 
   public static func deleteKeySet(account: String) throws {
-    let query =
-      [
-        kSecClass: kSecClassGenericPassword,
-        kSecAttrService: service,
-        kSecAttrAccount: account,
-        kSecAttrAccessGroup: group,
-      ] as CFDictionary
-    let status = SecItemDelete(query)
-    switch status {
-    case errSecSuccess:
-      return
-    default:
-      throw NotificationSettingsStorageError.delete
-    }
+    UserDefaults(suiteName: group)?.removeObject(forKey: keySetKey(account))
   }
 
   public static func setBadgeCount(badgeCount: Int) {

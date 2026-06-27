@@ -22,7 +22,7 @@ class LanguagesPage extends ConsumerWidget {
     final colors = ref.watch(misskeyColorsProvider(theme.brightness));
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.uiLanguage)),
+      title: Text(t.misskey.uiLanguage),
       body: ListTileTheme(
         tileColor: colors.panel,
         child: RadioGroup<AppLocale?>(

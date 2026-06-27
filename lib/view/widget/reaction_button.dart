@@ -21,8 +21,8 @@ import '../../util/future_with_dialog.dart';
 import '../dialog/confirmation_dialog.dart';
 import '../dialog/reaction_confirmation_dialog.dart';
 import 'emoji_widget.dart';
+import 'react_with_account.dart';
 import 'reaction_effect.dart';
-import 'reaction_users_sheet.dart';
 
 class ReactionButton extends ConsumerWidget {
   const ReactionButton({
@@ -162,16 +162,24 @@ class ReactionButton extends ConsumerWidget {
             }
           : null,
       onLongPress: note.id.isNotEmpty
-          ? () => showModalBottomSheet<void>(
-              context: context,
-              builder: (context) => ReactionUsersSheet(
-                account: account,
-                noteId: note.id,
-                initialReaction: emoji,
-              ),
-              clipBehavior: Clip.antiAlias,
-              isScrollControlled: true,
-            )
+          ? () {
+              // Anchor the picker at this chip; falls back to the "who reacted"
+              // sheet when there is only one account to pick from.
+              final box = context.findRenderObject() as RenderBox?;
+              final at = box != null && box.hasSize
+                  ? box.localToGlobal(box.size.centerRight(Offset.zero))
+                  : Offset.zero;
+              unawaited(
+                reactWithAccountOrShowUsers(
+                  context,
+                  ref,
+                  source: account,
+                  note: note,
+                  emoji: emoji,
+                  at: at,
+                ),
+              );
+            }
           : null,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.all(2.0 * scale),

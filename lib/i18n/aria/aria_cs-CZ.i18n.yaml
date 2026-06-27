@@ -1,5 +1,5 @@
 followConfirm(rich): "Jste si jisti, že chcete sledovat {name}?"
-i18nInfo(rich): "Aria je překládán do jiných jazyků dobrovolníkama. Můžete pomoci na {link}."
+i18nInfo(rich): "Daria je překládán do jiných jazyků dobrovolníkama. Můžete pomoci na {link}."
 onlineUsersCount(rich): "{n} uživatelů je online"
 renotedBy(rich): "{user} přeposla/a"
 unfollowConfirm(rich): "Jste si jisti že už nechcete sledovat {name}?"

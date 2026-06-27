@@ -14,12 +14,18 @@ class MisskeyServerAutocomplete extends ConsumerWidget {
     required this.focusNode,
     this.autofocus = false,
     this.onSubmitted,
+    this.showLabel = true,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool autofocus;
   final void Function(String)? onSubmitted;
+
+  /// Whether to show the in-field "Server URL" floating label. Disable it when
+  /// the caller renders its own caption above the field, to avoid a redundant
+  /// (and, with a filled borderless field, overlapping) floating label.
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +48,7 @@ class MisskeyServerAutocomplete extends ConsumerWidget {
                 focusNode: focusNode,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.dns),
-                  labelText: t.aria.serverUrl,
+                  labelText: showLabel ? t.aria.serverUrl : null,
                   hintText: 'misskey.io',
                   prefixText:
                       textEditingController.value.text.startsWith(

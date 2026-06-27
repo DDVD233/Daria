@@ -22,6 +22,7 @@ import '../../provider/note_notifier_provider.dart';
 import '../../provider/notes_notifier_provider.dart';
 import '../../util/future_with_dialog.dart';
 import '../../util/launch_url.dart';
+import '../widget/adaptive/adaptive_scaffold.dart';
 import '../widget/note_detailed_widget.dart';
 import '../widget/note_fallback_widget.dart';
 import '../widget/note_widget.dart';
@@ -37,30 +38,26 @@ class NotePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final note = ref.watch(noteNotifierProvider(account, noteId));
     if (note == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(t.misskey.note),
-          actions: [
-            IconButton(
-              tooltip: t.misskey.reload,
-              onPressed: () async {
-                await futureWithDialog(
-                  context,
-                  ref
-                      .read(notesNotifierProvider(account).notifier)
-                      .show(noteId),
-                );
-                ref
-                    .read(
-                      misskeySfxNotifierProvider(OperationType.reload).notifier,
-                    )
-                    .play()
-                    .ignore();
-              },
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
-        ),
+      return AdaptiveScaffold(
+        title: Text(t.misskey.note),
+        actions: [
+          IconButton(
+            tooltip: t.misskey.reload,
+            onPressed: () async {
+              await futureWithDialog(
+                context,
+                ref.read(notesNotifierProvider(account).notifier).show(noteId),
+              );
+              ref
+                  .read(
+                    misskeySfxNotifierProvider(OperationType.reload).notifier,
+                  )
+                  .play()
+                  .ignore();
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
         body: Align(
           alignment: Alignment.topCenter,
           child: Container(
@@ -86,14 +83,10 @@ class NotePage extends HookConsumerWidget {
     final meta = ref.watch(metaNotifierProvider(account.host)).value;
     final ltlAvailable =
         i?.policies?.ltlAvailable ?? meta?.policies?.ltlAvailable ?? true;
-    final gtlAvailable =
-        i?.policies?.ltlAvailable ?? meta?.policies?.ltlAvailable ?? true;
     final tabSettings = isChannelNote
         ? TabSettings.channel(account, note.channelId!)
         : ltlAvailable && note.user.host == null
         ? TabSettings.localTimeline(account)
-        : gtlAvailable
-        ? TabSettings.globalTimeline(account)
         : !account.isGuest
         ? TabSettings.homeTimeline(account)
         : null;
@@ -159,31 +152,27 @@ class NotePage extends HookConsumerWidget {
       misskeyColorsProvider(Theme.of(context).brightness),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(t.misskey.note),
-        actions: [
-          IconButton(
-            tooltip: t.misskey.reload,
-            onPressed: () async {
-              final appearNoteId = note.isRenote ? note.renoteId : note.id;
-              if (appearNoteId != null) {
-                ref.invalidate(
-                  conversationNotesProvider(account, appearNoteId),
-                );
-                ref.invalidate(
-                  childrenNotesNotifierProvider(account, appearNoteId),
-                );
-              }
-              await futureWithDialog(
-                context,
-                ref.read(notesNotifierProvider(account).notifier).show(noteId),
+    return AdaptiveScaffold(
+      title: Text(t.misskey.note),
+      actions: [
+        IconButton(
+          tooltip: t.misskey.reload,
+          onPressed: () async {
+            final appearNoteId = note.isRenote ? note.renoteId : note.id;
+            if (appearNoteId != null) {
+              ref.invalidate(conversationNotesProvider(account, appearNoteId));
+              ref.invalidate(
+                childrenNotesNotifierProvider(account, appearNoteId),
               );
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
+            }
+            await futureWithDialog(
+              context,
+              ref.read(notesNotifierProvider(account).notifier).show(noteId),
+            );
+          },
+          icon: const Icon(Icons.refresh),
+        ),
+      ],
       body: CustomScrollView(
         controller: controller,
         center: centerKey,

@@ -53,7 +53,7 @@ class _Translations$aria$pl_PL extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => 'Pomyślnie zaktualizowano token dostępu';
 	@override String get accountAdded => 'Pomyślnie dodano konto';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria jest rozwidleniem projektu '),
+		const TextSpan(text: 'Daria jest rozwidleniem projektu '),
 		miria,
 		const TextSpan(text: '.\nLokalizacja Arii opiera się na plikach lokalizacyjnych '),
 		misskey,
@@ -103,7 +103,7 @@ class _Translations$aria$pl_PL extends Translations$aria$en_US {
 		const TextSpan(text: '?'),
 	]);
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria jest tłumaczone na wiele języków przez wolontariuszy. Możesz pomóc na '),
+		const TextSpan(text: 'Daria jest tłumaczone na wiele języków przez wolontariuszy. Możesz pomóc na '),
 		link,
 		const TextSpan(text: '.'),
 	]);

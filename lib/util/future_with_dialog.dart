@@ -22,7 +22,7 @@ Future<T?> futureWithDialog<T>(
             child: Card(
               child: Padding(
                 padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator.adaptive(),
               ),
             ),
           ),

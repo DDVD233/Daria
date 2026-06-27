@@ -61,7 +61,7 @@ class ClipSettingsDialog extends HookWidget {
               ),
             ),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.public),
             value: settings.value.isPublic ?? false,
             onChanged: (value) =>

@@ -45,7 +45,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	final TranslationsJaJp _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Ariaについて';
+	@override String get aboutAria => 'Dariaについて';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		name,
 		const TextSpan(text: 'からのフォロー申請を許可しますか？'),
@@ -53,9 +53,9 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => 'アクセストークンを更新しました';
 	@override String get accountAdded => 'アカウントを追加しました';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaは'),
+		const TextSpan(text: 'Dariaは'),
 		miria,
-		const TextSpan(text: 'のフォークです。\nAriaのローカライゼーションは'),
+		const TextSpan(text: 'のフォークです。\nDariaのローカライゼーションは'),
 		misskey,
 		const TextSpan(text: 'のローカライゼーションファイルを基にしています。\n両プロジェクトのコントリビューターの皆様に感謝いたします。'),
 	]);
@@ -69,6 +69,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String get authenticated => '認証してきた';
 	@override String get avatarSize => 'アイコンのサイズ';
 	@override String get background => '背景';
+	@override String get boostWithAccount => 'このアカウントでリノート';
 	@override String get buttonTypes => 'ボタンのタイプ';
 	@override String get cache => 'キャッシュ';
 	@override String get calculating => '計算中';
@@ -125,15 +126,16 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 		const TextSpan(text: 'をフォローしますか？'),
 	]);
 	@override String get font => 'フォント';
+	@override String get forYou => 'おすすめ';
 	@override String get fromDevice => '端末から';
 	@override String get guest => 'ゲスト';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaは有志によって様々な言語に翻訳されています。'),
+		const TextSpan(text: 'Dariaは有志によって様々な言語に翻訳されています。'),
 		link,
 		const TextSpan(text: 'で翻訳に協力できます。'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaのアイコンは'),
+		const TextSpan(text: 'Dariaのアイコンは'),
 		sevenc_nanashi,
 		const TextSpan(text: 'によって作成され、'),
 		cc_by,
@@ -147,6 +149,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String jumpTo({required Object x}) => '${x}にジャンプ';
 	@override String get keepOpen => '開いたままにする';
 	@override String get keepTimelinePosition => 'タイムラインの位置を保持する';
+	@override String get likeWithAccount => 'このアカウントでいいね';
 	@override String get lineHeight => '行間';
 	@override String get loadFromDrive => 'ドライブから読み込み';
 	@override String get loginWithAccessToken => 'アクセストークンでログイン';
@@ -214,6 +217,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String get pleaseCopyResponse => '以下のレスポンスをコピーしてください';
 	@override String pleaseLoginAs({required Object user}) => '${user}でログインしてください';
 	@override String get postConfirm => 'このノートを投稿しますか？';
+	@override String get reactWithAccount => 'このアカウントでリアクション';
 	@override String get reactionConfirm => 'リアクションしますか？';
 	@override String get recentlyUsedEmojis => '最近使用した絵文字';
 	@override TextSpan rejectFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
@@ -237,7 +241,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String get sendMessageConfirm => 'このメッセージを送信しますか？';
 	@override String get server => 'サーバー';
 	@override String get serverUrl => 'サーバーのURL';
-	@override String get settingsFileForAria => 'Ariaの設定ファイル';
+	@override String get settingsFileForAria => 'Dariaの設定ファイル';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: 'の設定'),

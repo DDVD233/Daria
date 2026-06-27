@@ -25,7 +25,7 @@ class ThemePage extends ConsumerWidget {
     final installedColors = ref.watch(installedMisskeyColorsProvider);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.theme)),
+      title: Text(t.misskey.theme),
       body: ListTileTheme(
         data: ListTileThemeData(
           tileColor: Theme.of(context).colorScheme.surface,

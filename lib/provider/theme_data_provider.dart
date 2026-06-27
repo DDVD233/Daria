@@ -44,6 +44,14 @@ ThemeData themeData(Ref ref, Brightness brightness) {
     } catch (_) {}
   }
 
+  // Bottom sheets, dialogs, and menus default to Material 3's seed-derived
+  // `surfaceContainer*` tones, which pick up the brand-orange accent and tint
+  // these overlays. Force a neutral surface so they read as plain white in
+  // light mode (and the theme's own panel colour in dark mode) instead.
+  final overlaySurfaceColor = brightness == Brightness.light
+      ? Colors.white
+      : colors.panel;
+
   return ThemeData(
     colorScheme: colorScheme.copyWith(
       primary: colors.accent,
@@ -112,7 +120,23 @@ ThemeData themeData(Ref ref, Brightness brightness) {
       backgroundColor: colors.accent,
     ),
     popupMenuTheme: PopupMenuThemeData(
+      color: overlaySurfaceColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: overlaySurfaceColor,
+      modalBackgroundColor: overlaySurfaceColor,
+    ),
+    dialogTheme: DialogThemeData(backgroundColor: overlaySurfaceColor),
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(overlaySurfaceColor),
+      ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(overlaySurfaceColor),
+      ),
     ),
     sliderTheme: const SliderThemeData(
       showValueIndicator: ShowValueIndicator.onDrag,

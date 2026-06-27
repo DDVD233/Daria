@@ -8,18 +8,22 @@ import 'package:misskey_dart/misskey_dart.dart';
 import '../../i18n/strings.g.dart';
 import '../../model/account.dart';
 import '../../provider/account_settings_notifier_provider.dart';
+import '../../provider/accounts_notifier_provider.dart';
 import '../../provider/api/i_notifier_provider.dart';
 import '../../provider/api/misskey_provider.dart';
 import '../../provider/general_settings_notifier_provider.dart';
 import '../../provider/notes_notifier_provider.dart';
 import '../../util/future_with_dialog.dart';
+import '../../util/resolve_note_for_account.dart';
 import '../dialog/post_confirmation_dialog.dart';
 import '../dialog/user_select_dialog.dart';
 import '../page/channel/channels_page.dart';
+import 'account_preview.dart';
 import 'mention_widget.dart';
 import 'note_visibility_icon.dart';
 import 'note_visibility_sheet.dart';
 import 'note_visibility_widget.dart';
+import 'user_avatar.dart';
 
 class RenoteSheet extends HookConsumerWidget {
   const RenoteSheet({super.key, required this.account, required this.note});
@@ -54,11 +58,20 @@ class RenoteSheet extends HookConsumerWidget {
     );
     final localOnly = useState(note.localOnly || renoteLocalOnly);
     final visibleUsers = useState<List<User>>([]);
+    // "Boost with account": the account that will actually renote, defaulting to
+    // the timeline's account. Local-only notes can only be renoted from their own
+    // server, so cross-server accounts are excluded as candidates.
+    final boostAccount = useState(account);
+    final accountExpanded = useState(false);
+    final candidates = ref
+        .watch(accountsNotifierProvider)
+        .where((acct) => !note.localOnly || acct.host == account.host)
+        .toList();
 
     return ListView(
       shrinkWrap: true,
       children: [
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.aria.renoteToChannel),
           value: renoteToChannel.value,
           onChanged: note.channel?.allowRenoteToExternal ?? true
@@ -162,7 +175,7 @@ class RenoteSheet extends HookConsumerWidget {
                 ),
               ),
             ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             secondary: Icon(localOnly.value ? OffIcons.rocket : Icons.rocket),
             title: Text(t.misskey.localOnly),
             value: localOnly.value,
@@ -182,68 +195,128 @@ class RenoteSheet extends HookConsumerWidget {
                 : null,
           ),
         ],
+        if (candidates.length > 1) ...[
+          const Divider(height: 0.0),
+          ListTile(
+            leading: const Icon(Icons.switch_account),
+            title: Text(t.aria.boostWithAccount),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _MiniAvatar(account: boostAccount.value),
+                Icon(
+                  accountExpanded.value
+                      ? Icons.arrow_drop_up
+                      : Icons.arrow_drop_down,
+                ),
+              ],
+            ),
+            onTap: () => accountExpanded.value = !accountExpanded.value,
+          ),
+          AnimatedCrossFade(
+            firstChild: const SizedBox(width: double.infinity),
+            secondChild: Column(
+              children: [
+                for (final candidate in candidates)
+                  AccountPreview(
+                    account: candidate,
+                    trailing: candidate == boostAccount.value
+                        ? Icon(
+                            Icons.check,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
+                        : null,
+                    onTap: () {
+                      boostAccount.value = candidate;
+                      accountExpanded.value = false;
+                    },
+                  ),
+              ],
+            ),
+            crossFadeState: accountExpanded.value
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 180),
+          ),
+        ],
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton.icon(
             onPressed: !renoteToChannel.value || channel.value != null
                 ? () async {
-                    final request = NotesCreateRequest(renoteId: note.id);
+                    final target = boostAccount.value;
+                    // Resolve the note id on the target's server first, so both
+                    // the confirm preview and the renote use an id that exists
+                    // there. Without this, a cross-server renote 502s because
+                    // the source note id is unknown to the target server.
+                    final String renoteId;
+                    if (target.host == account.host) {
+                      renoteId = note.id;
+                    } else {
+                      final resolved = await futureWithDialog(
+                        context,
+                        resolveNoteIdFor(
+                          ref,
+                          source: account,
+                          target: target,
+                          note: note,
+                        ),
+                      );
+                      if (resolved == null || !context.mounted) return;
+                      renoteId = resolved;
+                    }
                     if (ref
                         .read(generalSettingsNotifierProvider)
                         .confirmBeforeRenote) {
                       final confirmed = await confirmPost(
                         ref,
-                        account,
+                        target,
                         NoteDraft(
                           id: '',
                           createdAt: DateTime.now(),
                           userId: '',
                           user: const UserLite(id: '', username: ''),
-                          renoteId: note.id,
+                          renoteId: renoteId,
                         ),
                       );
                       if (!confirmed) return;
                     }
                     if (!context.mounted) return;
-                    if (renoteToChannel.value) {
-                      if (channel.value case final channel?) {
-                        final result = await futureWithDialog(
-                          context,
-                          ref
-                              .read(misskeyProvider(account))
-                              .notes
-                              .create(request.copyWith(channelId: channel.id)),
-                          message: t.misskey.renotedToX(name: channel.name),
-                        );
-                        if (result != null) {
-                          ref
-                              .read(notesNotifierProvider(account).notifier)
-                              .add(result);
-                          if (!context.mounted) return;
-                          context.pop(result);
-                        }
-                      }
-                    } else {
-                      final result = await futureWithDialog(
-                        context,
-                        ref
-                            .read(misskeyProvider(account))
-                            .notes
-                            .create(
-                              request.copyWith(
-                                visibility: visibility.value,
-                                localOnly: localOnly.value,
-                              ),
-                            ),
-                        message: t.misskey.renoted,
-                      );
-                      if (!context.mounted) return;
-                      if (result != null) {
-                        ref
-                            .read(notesNotifierProvider(account).notifier)
-                            .add(result);
-                        context.pop(result);
-                      }
+                    // Renoting to a channel only makes sense on the note's own
+                    // server, so it falls back to a plain renote cross-account.
+                    final useChannel =
+                        renoteToChannel.value && target == account;
+                    final request = NotesCreateRequest(renoteId: renoteId);
+                    final result = await futureWithDialog(
+                      context,
+                      useChannel
+                          ? ref
+                                .read(misskeyProvider(target))
+                                .notes
+                                .create(
+                                  request.copyWith(
+                                    channelId: channel.value!.id,
+                                  ),
+                                )
+                          : ref
+                                .read(misskeyProvider(target))
+                                .notes
+                                .create(
+                                  request.copyWith(
+                                    visibility: visibility.value,
+                                    localOnly: localOnly.value,
+                                  ),
+                                ),
+                      message: useChannel
+                          ? t.misskey.renotedToX(name: channel.value!.name)
+                          : t.misskey.renoted,
+                    );
+                    if (!context.mounted) return;
+                    if (result != null) {
+                      ref
+                          .read(notesNotifierProvider(target).notifier)
+                          .add(result);
+                      context.pop(result);
                     }
                   }
                 : null,
@@ -253,5 +326,19 @@ class RenoteSheet extends HookConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+class _MiniAvatar extends ConsumerWidget {
+  const _MiniAvatar({required this.account});
+
+  final Account account;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final i = ref.watch(iNotifierProvider(account)).value;
+    return i != null
+        ? UserAvatar(account: account, user: i, size: 24.0)
+        : const Icon(Icons.account_circle, size: 24.0);
   }
 }

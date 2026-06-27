@@ -20,7 +20,7 @@ final class PushSubscriptionNotifierProvider
   }) : super(
          retry: null,
          name: r'pushSubscriptionNotifierProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -60,7 +60,7 @@ final class PushSubscriptionNotifierProvider
 }
 
 String _$pushSubscriptionNotifierHash() =>
-    r'04966a4c91b04bfe8dcf8179e18654a482109fad';
+    r'b487862d198aae37974e2421afa4699b0f0e8211';
 
 final class PushSubscriptionNotifierFamily extends $Family
     with
@@ -77,7 +77,7 @@ final class PushSubscriptionNotifierFamily extends $Family
         name: r'pushSubscriptionNotifierProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   PushSubscriptionNotifierProvider call(Account account) =>

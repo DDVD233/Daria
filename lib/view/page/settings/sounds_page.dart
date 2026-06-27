@@ -24,7 +24,7 @@ class SoundsPage extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.sounds)),
+      title: Text(t.misskey.sounds),
       body: ListTileTheme(
         data: ListTileThemeData(tileColor: theme.colorScheme.surface),
         child: ListView(
@@ -34,7 +34,7 @@ class SoundsPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.notUseSound),
                   value: settings.notUseSound,
                   onChanged: (value) => ref
@@ -219,7 +219,7 @@ class _SoundSettingsWidget extends HookConsumerWidget {
           ),
           enabled: !notUseSound,
         ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.aria.vibration),
           value: sound?.vibrate ?? false,
           onChanged: (value) => ref

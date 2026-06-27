@@ -44,7 +44,7 @@ class _Translations$aria$it_IT extends Translations$aria$en_US {
 	final TranslationsItIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Informazioni Su Aria';
+	@override String get aboutAria => 'Informazioni Su Daria';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		const TextSpan(text: 'Sei sicuro di voler accettare la richiesta seguente da '),
 		name,
@@ -54,9 +54,9 @@ class _Translations$aria$it_IT extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => 'Token di accesso aggiornato con successo';
 	@override String get accountAdded => 'Account aggiunto con successo';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria è un fork di '),
+		const TextSpan(text: 'Daria è un fork di '),
 		miria,
-		const TextSpan(text: '.\nLa localizzazione di Aria si basa su file di localizzazione di '),
+		const TextSpan(text: '.\nLa localizzazione di Daria si basa su file di localizzazione di '),
 		misskey,
 		const TextSpan(text: '.\nVorremmo mostrare il nostro apprezzamento a tutti i collaboratori di questi progetti.'),
 	]);
@@ -131,12 +131,12 @@ class _Translations$aria$it_IT extends Translations$aria$en_US {
 	@override String get fromDevice => 'Dal dispositivo';
 	@override String get guest => 'Ospite';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria è tradotto in diverse lingue da volontari. Anche tu puoi contribuire su '),
+		const TextSpan(text: 'Daria è tradotto in diverse lingue da volontari. Anche tu puoi contribuire su '),
 		link,
 		const TextSpan(text: '.'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'L\'icona di Aria è stata creata da '),
+		const TextSpan(text: 'L\'icona di Daria è stata creata da '),
 		sevenc_nanashi,
 		const TextSpan(text: ' ed è autorizzata sotto '),
 		cc_by,
@@ -241,7 +241,7 @@ class _Translations$aria$it_IT extends Translations$aria$en_US {
 	@override String get sendMessageConfirm => 'Sei sicuro di voler rinotare questa nota?';
 	@override String get server => 'Server';
 	@override String get serverUrl => 'Server Url';
-	@override String get settingsFileForAria => 'File impostazioni per Aria';
+	@override String get settingsFileForAria => 'File impostazioni per Daria';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		const TextSpan(text: 'Impostazioni di '),
 		user,

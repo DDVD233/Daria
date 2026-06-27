@@ -181,13 +181,13 @@ class AntennaSettingsDialog extends HookConsumerWidget {
                 ],
               ),
             ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.antennaExcludeBots),
             value: settings.value.excludeBots ?? false,
             onChanged: (value) =>
                 settings.value = settings.value.copyWith(excludeBots: value),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.withReplies),
             value: settings.value.withReplies ?? false,
             onChanged: (value) =>
@@ -228,19 +228,19 @@ class AntennaSettingsDialog extends HookConsumerWidget {
               ),
             ),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.localOnly),
             value: settings.value.localOnly ?? false,
             onChanged: (value) =>
                 settings.value = settings.value.copyWith(localOnly: value),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.caseSensitive),
             value: settings.value.caseSensitive ?? false,
             onChanged: (value) =>
                 settings.value = settings.value.copyWith(caseSensitive: value),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.withFileAntenna),
             value: settings.value.withFile ?? false,
             onChanged: (value) =>
@@ -251,7 +251,7 @@ class AntennaSettingsDialog extends HookConsumerWidget {
                     (param) => param.name == 'excludeNotesInSensitiveChannel',
                   ) ??
                   false))
-            SwitchListTile(
+            SwitchListTile.adaptive(
               title: Text(t.misskey.excludeNotesInSensitiveChannel),
               value: settings.value.excludeNotesInSensitiveChannel ?? false,
               onChanged: (value) => settings.value = settings.value.copyWith(

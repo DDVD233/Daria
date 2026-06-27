@@ -6,8 +6,8 @@
 	<string>development</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.poppingmoon.aria.Share-Extension</string>
-		<string>group.com.poppingmoon.aria.Notification-Service-Extension</string>
+		<string>group.chat.dvd.Daria.Share-Extension</string>
+		<string>group.chat.dvd.Daria.Notification-Service-Extension</string>
 	</array>
 </dict>
 </plist>

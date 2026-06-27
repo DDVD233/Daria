@@ -37,8 +37,8 @@ import 'muted_note_widget.dart';
 import 'note_footer.dart';
 import 'note_sheet.dart';
 import 'note_simple_widget.dart';
-import 'note_sub_widget.dart';
 import 'note_visibility_icon.dart';
+import 'note_widget.dart';
 import 'pagination_bottom_widget.dart';
 import 'poll_widget.dart';
 import 'reactions_viewer.dart';
@@ -89,8 +89,6 @@ class NoteDetailedWidget extends HookConsumerWidget {
     }
 
     final (
-      showSubNoteFooter,
-      enableInfiniteScroll,
       verticalPadding,
       horizontalPadding,
       tapAction,
@@ -99,8 +97,6 @@ class NoteDetailedWidget extends HookConsumerWidget {
     ) = ref.watch(
       generalSettingsNotifierProvider.select(
         (settings) => (
-          settings.showSubNoteFooter,
-          settings.enableInfiniteScroll,
           settings.noteVerticalPadding,
           settings.noteHorizontalPadding,
           settings.noteTapAction,
@@ -115,6 +111,7 @@ class NoteDetailedWidget extends HookConsumerWidget {
     final conversation = appearNote.replyId != null
         ? ref.watch(conversationNotesProvider(account, appearNote.id))
         : null;
+    final replies = children.value?.items ?? const <Note>[];
     final isRenote = note.isRenote;
     final onTap = useMemoized(
       () => tapAction != NoteActionType.expand
@@ -152,7 +149,6 @@ class NoteDetailedWidget extends HookConsumerWidget {
           : null,
       [account, longPressAction, noteId],
     );
-    final theme = Theme.of(context);
     final style = DefaultTextStyle.of(context).style;
 
     return InkWell(
@@ -164,49 +160,25 @@ class NoteDetailedWidget extends HookConsumerWidget {
           start: 4.0,
           top: verticalPadding,
           end: horizontalPadding,
-          bottom: (children.value?.items.isEmpty ?? true) || showSubNoteFooter
-              ? max(0.0, verticalPadding - 8.0)
-              : verticalPadding,
+          bottom: max(0.0, verticalPadding - 8.0),
         ),
         child: Column(
           children: [
-            if (conversation?.value case final conversation?)
-              DefaultTextStyle.merge(
-                style: style.apply(
-                  color: style.color?.withValues(alpha: 0.7),
-                  fontSizeFactor: 0.9,
-                ),
-                child: IconTheme.merge(
-                  data: IconThemeData(
-                    color: style.color?.withValues(alpha: 0.7),
+            // Ancestors (oldest first): full notes connected down into the
+            // focused note by the gray thread line.
+            if (conversation?.value case final ancestors?)
+              if (ancestors.isEmpty) ...[
+                const DeletedNoteWidget(),
+                const SizedBox(height: 8.0),
+              ] else
+                for (final (index, ancestor) in ancestors.reversed.indexed)
+                  NoteWidget(
+                    account: account,
+                    noteId: ancestor.id,
+                    backgroundColor: Colors.transparent,
+                    connectTop: index > 0,
+                    connectBottom: true,
                   ),
-                  child: Column(
-                    children: [
-                      if (conversation.isNotEmpty)
-                        for (final note in conversation.reversed) ...[
-                          ChannelColorBarBox(
-                            note: note,
-                            barBottomPadding: showSubNoteFooter ? 8.0 : 0.0,
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.only(
-                                start: horizontalPadding - 4.0,
-                              ),
-                              child: NoteSubWidget(
-                                account: account,
-                                noteId: note.id,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: showSubNoteFooter ? 4.0 : 12.0),
-                        ]
-                      else ...[
-                        const DeletedNoteWidget(),
-                        const SizedBox(height: 8.0),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
             if (isRenote) ...[
               ChannelColorBarBox(
                 note: note,
@@ -229,15 +201,12 @@ class NoteDetailedWidget extends HookConsumerWidget {
               ),
               const SizedBox(height: 4.0),
             ],
+            // Focused note. The avatar is aligned with the ancestor notes
+            // (start: horizontalPadding) so the thread line connects into it.
             ChannelColorBarBox(
               note: appearNote,
-              barBottomPadding: children.value?.items.isEmpty ?? true
-                  ? min(verticalPadding, 8.0)
-                  : 8.0,
               child: Padding(
-                padding: EdgeInsetsDirectional.only(
-                  start: horizontalPadding - 4.0,
-                ),
+                padding: EdgeInsetsDirectional.only(start: horizontalPadding),
                 child: _NoteDetailedContent(
                   account: account,
                   note: note,
@@ -246,78 +215,27 @@ class NoteDetailedWidget extends HookConsumerWidget {
                 ),
               ),
             ),
-            if (children.value?.items case final notes?
-                when notes.isNotEmpty) ...[
-              const SizedBox(height: 4.0),
-              ListView.separated(
-                padding: EdgeInsets.zero,
-                itemBuilder: (context, index) => index < notes.length
-                    ? ChannelColorBarBox(
-                        note: notes[index],
-                        barBottomPadding: showSubNoteFooter
-                            ? index == notes.length - 1
-                                  ? min(verticalPadding, 8.0)
-                                  : 8.0
-                            : 0.0,
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.only(
-                            start: horizontalPadding - 4.0,
-                          ),
-                          child: ColorBarBox(
-                            color: theme.colorScheme.outlineVariant,
-                            width: 2.0,
-                            barBottomPadding:
-                                showSubNoteFooter && index == notes.length - 1
-                                ? min(verticalPadding, 8.0)
-                                : 0.0,
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.only(
-                                start: 6.0,
-                              ),
-                              child: NoteSubWidget(
-                                account: account,
-                                noteId: notes[index].id,
-                                showReplies: true,
-                                barBottomPadding:
-                                    showSubNoteFooter &&
-                                        index == notes.length - 1
-                                    ? min(verticalPadding, 8.0)
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : PaginationBottomWidget(
-                        paginationState: children,
-                        loadMore: () => ref
-                            .read(
-                              childrenNotesNotifierProvider(
-                                account,
-                                appearNote.id,
-                              ).notifier,
-                            )
-                            .loadMore(skipError: true),
-                      ),
-                separatorBuilder: (context, index) => index < notes.length - 1
-                    ? Container(
-                        margin: EdgeInsetsDirectional.only(
-                          start: horizontalPadding - 4.0,
-                        ),
-                        decoration: BoxDecoration(
-                          border: BorderDirectional(
-                            start: BorderSide(
-                              color: theme.colorScheme.outlineVariant,
-                              width: 2.0,
-                            ),
-                          ),
-                        ),
-                        height: showSubNoteFooter ? 4.0 : 12.0,
-                      )
-                    : const SizedBox.shrink(),
-                itemCount: notes.length + 1,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
+            // Replies: a flat list of full notes, each tappable to open its own
+            // thread.
+            if (replies.isNotEmpty) ...[
+              for (final reply in replies) ...[
+                const Divider(height: 1.0),
+                NoteWidget(
+                  account: account,
+                  noteId: reply.id,
+                  backgroundColor: Colors.transparent,
+                ),
+              ],
+              PaginationBottomWidget(
+                paginationState: children,
+                loadMore: () => ref
+                    .read(
+                      childrenNotesNotifierProvider(
+                        account,
+                        appearNote.id,
+                      ).notifier,
+                    )
+                    .loadMore(skipError: true),
               ),
             ],
           ],
@@ -385,6 +303,7 @@ class _NoteDetailedContent extends HookConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             UserAvatar(
               account: account,

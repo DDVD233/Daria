@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../model/account.dart';
+import 'active_account_notifier_provider.dart';
 import 'dio_provider.dart';
 import 'server_url_notifier_provider.dart';
 import 'shared_preferences_provider.dart';
@@ -65,6 +66,9 @@ class AccountsNotifier extends _$AccountsNotifier {
     final account = Account(host: host, username: username);
     await ref.read(tokensNotifierProvider.notifier).add(account, token);
     await ref.read(userIdsNotifierProvider.notifier).add(account, userId);
+    // Switch to the account that was just authenticated (newly added or
+    // re-logged-in) so the app lands on it.
+    await ref.read(activeAccountNotifierProvider.notifier).select(account);
     if (state.contains(account)) {
       return (added: false);
     }
@@ -91,6 +95,11 @@ class AccountsNotifier extends _$AccountsNotifier {
   Future<void> remove(Account account) async {
     state = state.where((acct) => acct != account).toList();
     await ref.read(tokensNotifierProvider.notifier).remove(account);
+    // Drop the active-account pointer if it referenced the removed account, so
+    // [currentAccount] falls back to the first remaining account.
+    if (ref.read(activeAccountNotifierProvider) == account) {
+      await ref.read(activeAccountNotifierProvider.notifier).clear();
+    }
     await _save();
   }
 

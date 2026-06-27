@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../i18n/strings.g.dart';
@@ -15,17 +17,44 @@ part 'general_settings_notifier_provider.g.dart';
 class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
   @override
   GeneralSettings build() {
-    final value = ref.watch(sharedPreferencesProvider).getString(_key);
-    if (value != null) {
-      return GeneralSettings.fromJson(
-        jsonDecode(value) as Map<String, dynamic>,
-      );
-    } else {
-      return const GeneralSettings();
-    }
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final value = prefs.getString(_key);
+    final settings = value != null
+        ? GeneralSettings.fromJson(jsonDecode(value) as Map<String, dynamic>)
+        : const GeneralSettings();
+    return _migrate(prefs, settings);
   }
 
   static const _key = 'generalSettings';
+  static const _migrationVersionKey = 'generalSettingsMigrationVersion';
+  static const _migrationVersion = 2;
+
+  /// Brings installs that persisted old defaults up to the current dvd.chat
+  /// defaults. These are one-time nudges; the user can still change the
+  /// settings afterwards.
+  GeneralSettings _migrate(
+    SharedPreferencesWithCache prefs,
+    GeneralSettings settings,
+  ) {
+    final version = prefs.getInt(_migrationVersionKey) ?? 0;
+    if (version >= _migrationVersion) {
+      return settings;
+    }
+    var migrated = settings;
+    if (version < 1) {
+      // The like button became shown by default.
+      migrated = migrated.copyWith(showLikeButtonInNoteFooter: true);
+    }
+    if (version < 2) {
+      // Reactions are sent directly without a confirmation dialog.
+      migrated = migrated.copyWith(confirmBeforeReact: false);
+    }
+    unawaited(() async {
+      await prefs.setInt(_migrationVersionKey, _migrationVersion);
+      await prefs.setString(_key, jsonEncode(migrated.toJson()));
+    }());
+    return migrated;
+  }
 
   Future<void> _save() async {
     await ref

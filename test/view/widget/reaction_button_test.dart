@@ -9,6 +9,7 @@ import 'package:aria/provider/general_settings_notifier_provider.dart';
 import 'package:aria/provider/misskey_colors_provider.dart';
 import 'package:aria/provider/note_notifier_provider.dart';
 import 'package:aria/provider/server_url_notifier_provider.dart';
+import 'package:aria/provider/shared_preferences_provider.dart';
 import 'package:aria/view/dialog/reaction_confirmation_dialog.dart';
 import 'package:aria/view/widget/reaction_button.dart';
 import 'package:aria/view/widget/reaction_users_sheet.dart';
@@ -23,6 +24,7 @@ import 'package:misskey_dart/misskey_dart.dart';
 
 import '../../test_util/dummy_note.dart';
 import '../../test_util/dummy_user_lite.dart';
+import '../../test_util/fake_shared_preferences.dart';
 
 Future<void> setupWidget(
   WidgetTester tester, {
@@ -47,6 +49,7 @@ Future<void> setupWidget(
         serverUrlNotifierProvider(
           account.host,
         ).overrideWithValue(Uri.https(account.host)),
+        sharedPreferencesProvider.overrideWithValue(FakeSharedPreferences({})),
         ...overrides,
       ],
       child: MaterialApp.router(
@@ -276,6 +279,7 @@ void main() {
           note: dummyNote.copyWith(id: 'test'),
           emoji: ':emoji:',
           count: 1,
+          generalSettings: const GeneralSettings(confirmBeforeReact: true),
           overrides: [
             emojisNotifierProvider(account.host).overrideWithBuild(
               (_, _) => {
@@ -314,6 +318,7 @@ void main() {
         emoji: ':emoji:',
         count: 1,
         dio: dio,
+        generalSettings: const GeneralSettings(confirmBeforeReact: true),
         overrides: [
           emojisNotifierProvider(
             account.host,

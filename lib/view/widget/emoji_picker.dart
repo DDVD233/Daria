@@ -183,7 +183,7 @@ class EmojiPicker extends HookConsumerWidget {
       controller: scrollController,
       children: [
         if (post)
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.aria.keepOpen),
             value: keepOpen,
             onChanged: (value) => ref

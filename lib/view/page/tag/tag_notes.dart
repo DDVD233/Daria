@@ -70,12 +70,12 @@ class TagNotes extends HookConsumerWidget {
                 ),
                 children: [
                   const Divider(height: 1.0),
-                  SwitchListTile(
+                  SwitchListTile.adaptive(
                     title: Text(t.misskey.showRepliesToOthersInTimeline),
                     value: withReplies.value,
                     onChanged: (value) => withReplies.value = value,
                   ),
-                  SwitchListTile(
+                  SwitchListTile.adaptive(
                     title: Text(t.misskey.fileAttachedOnly),
                     value: withFiles.value,
                     onChanged: (value) => withFiles.value = value,

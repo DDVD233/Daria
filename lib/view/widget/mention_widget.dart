@@ -62,9 +62,13 @@ class MentionWidget extends HookConsumerWidget {
     final color = (isMe ? colors.mentionMe : colors.mention).withValues(
       alpha: opacity,
     );
-    final style = DefaultTextStyle.of(
-      context,
-    ).style.apply(fontSizeFactor: scale, color: color);
+    final style = DefaultTextStyle.of(context)
+        .style
+        .apply(fontSizeFactor: scale, color: color)
+        // Notes use a tall line-height multiplier; collapse it for the pill so
+        // the chip is no taller than the glyphs and doesn't bloat the line.
+        .copyWith(height: 1.0);
+    final fontSize = style.fontSize ?? 14.0;
 
     return ChipTheme(
       data: ChipThemeData.fromDefaults(
@@ -85,7 +89,7 @@ class MentionWidget extends HookConsumerWidget {
             cacheManager: ref.watch(cacheManagerProvider),
           ),
           onForegroundImageError: (_, _) {},
-          minRadius: style.fontSize,
+          radius: fontSize * 0.6,
         ),
         label: Text.rich(
           TextSpan(
@@ -103,13 +107,14 @@ class MentionWidget extends HookConsumerWidget {
           textDirection: TextDirection.ltr,
           textScaler: textScaler,
         ),
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.fromLTRB(1.0, 1.0, 4.0, 1.0),
         labelPadding: EdgeInsets.only(left: 2.0 * scale, right: 4.0),
         onPressed: onTap,
         onDeleted: onDeleted,
         side: BorderSide.none,
         shape: const StadiumBorder(),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
       ),
     );
   }

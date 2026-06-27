@@ -167,7 +167,7 @@ class TimelineButtonsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showSmallButtons),
                   value: settings.showSmallTimelinesPageButtons,
                   onChanged: (value) => ref
@@ -185,7 +185,7 @@ class TimelineButtonsPage extends ConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showSquaredButtons),
                   value: settings.showSquaredTimelinesPageButtons,
                   onChanged: (value) => ref

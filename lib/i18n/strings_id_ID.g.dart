@@ -44,11 +44,11 @@ class _Translations$aria$id_ID extends Translations$aria$en_US {
 	final TranslationsIdId _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Tentang Aria';
+	@override String get aboutAria => 'Tentang Daria';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria adalah fork dari '),
+		const TextSpan(text: 'Daria adalah fork dari '),
 		miria,
-		const TextSpan(text: '.\nTerjemahan Aria berdasarkan dari berkas terjemahan dari '),
+		const TextSpan(text: '.\nTerjemahan Daria berdasarkan dari berkas terjemahan dari '),
 		misskey,
 		const TextSpan(text: '.\nKami ingin menunjukkan apresiasi kami kepada semua kontributor projek ini.'),
 	]);
@@ -109,12 +109,12 @@ class _Translations$aria$id_ID extends Translations$aria$en_US {
 	@override String get fromDevice => 'Dari perangkat';
 	@override String get guest => 'Pengunjung';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria diterjemahkan ke dalam banyak bahasa oleh sukarelawan. Kamu juga dapat ikut membantu menerjemahkannya di '),
+		const TextSpan(text: 'Daria diterjemahkan ke dalam banyak bahasa oleh sukarelawan. Kamu juga dapat ikut membantu menerjemahkannya di '),
 		link,
 		const TextSpan(text: '.'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Icon dari Aria dibuat oleh '),
+		const TextSpan(text: 'Icon dari Daria dibuat oleh '),
 		sevenc_nanashi,
 		const TextSpan(text: ' dan memiliki lisensi di bawah '),
 		cc_by,
@@ -193,7 +193,7 @@ class _Translations$aria$id_ID extends Translations$aria$en_US {
 		user,
 	]);
 	@override String get serverUrl => 'URL Server';
-	@override String get settingsFileForAria => 'Berkas pengaturan untuk Aria';
+	@override String get settingsFileForAria => 'Berkas pengaturan untuk Daria';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		const TextSpan(text: 'Pengaturan untuk '),
 		user,

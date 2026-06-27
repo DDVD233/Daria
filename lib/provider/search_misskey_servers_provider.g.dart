@@ -67,7 +67,7 @@ final class SearchMisskeyServersProvider
 }
 
 String _$searchMisskeyServersHash() =>
-    r'5d85ae53e7d9115ab65f50045b3c445f3d3703e9';
+    r'6ef0b466f17ac973df421ff711d317490dea4a47';
 
 final class SearchMisskeyServersFamily extends $Family
     with

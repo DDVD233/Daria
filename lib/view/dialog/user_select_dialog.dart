@@ -169,46 +169,53 @@ class UserSelectDialog extends HookConsumerWidget {
             PinnedHeaderSliver(
               child: Shortcuts(
                 shortcuts: disablingTextShortcuts,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          labelText: searchByUsername.value
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _LabeledField(
+                          label: searchByUsername.value
                               ? t.misskey.username
                               : t.misskey.search,
-                          prefixText: searchByUsername.value ? '@' : null,
-                          prefixIcon: !searchByUsername.value
-                              ? const Icon(Icons.search)
-                              : null,
-                          enabledBorder: theme.inputDecorationTheme.border,
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                        ),
-                        onChanged: (value) => query.value = value,
-                        keyboardType: TextInputType.url,
-                        textInputAction: TextInputAction.next,
-                        onTapOutside: (_) => primaryFocus?.unfocus(),
-                      ),
-                    ),
-                    if (searchByUsername.value && !localOnly) ...[
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            labelText: t.misskey.host,
-                            prefixText: '@',
-                            enabledBorder: theme.inputDecorationTheme.border,
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                          child: TextField(
+                            decoration: InputDecoration(
+                              prefixText: searchByUsername.value ? '@' : null,
+                              prefixIcon: !searchByUsername.value
+                                  ? const Icon(Icons.search)
+                                  : null,
+                              enabledBorder: theme.inputDecorationTheme.border,
+                            ),
+                            onChanged: (value) => query.value = value,
+                            keyboardType: TextInputType.url,
+                            textInputAction: TextInputAction.next,
+                            onTapOutside: (_) => primaryFocus?.unfocus(),
                           ),
-                          onChanged: (value) => host.value = value,
-                          keyboardType: TextInputType.url,
-                          textInputAction: TextInputAction.done,
-                          onTapOutside: (_) => primaryFocus?.unfocus(),
                         ),
                       ),
+                      if (searchByUsername.value && !localOnly) ...[
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: _LabeledField(
+                            label: t.misskey.host,
+                            child: TextField(
+                              decoration: InputDecoration(
+                                prefixText: '@',
+                                enabledBorder:
+                                    theme.inputDecorationTheme.border,
+                              ),
+                              onChanged: (value) => host.value = value,
+                              keyboardType: TextInputType.url,
+                              textInputAction: TextInputAction.done,
+                              onTapOutside: (_) => primaryFocus?.unfocus(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -305,6 +312,30 @@ class UserSelectDialog extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A text field with a caption label rendered above it, so the label can't
+/// overlap the filled field's top edge (as a floating label would).
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 4.0, bottom: 4.0),
+          child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ),
+        child,
+      ],
     );
   }
 }

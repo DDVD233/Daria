@@ -27,6 +27,8 @@ class TimelineNote extends HookConsumerWidget {
     this.borderRadius,
     this.hide = false,
     this.listViewKey,
+    this.connectTop = false,
+    this.connectBottom = false,
   });
 
   final TabSettings tabSettings;
@@ -36,6 +38,8 @@ class TimelineNote extends HookConsumerWidget {
   final BorderRadiusGeometry? borderRadius;
   final bool hide;
   final GlobalKey? listViewKey;
+  final bool connectTop;
+  final bool connectBottom;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -64,6 +68,8 @@ class TimelineNote extends HookConsumerWidget {
         margin: margin,
         borderRadius: borderRadius,
         listViewKey: listViewKey,
+        connectTop: connectTop,
+        connectBottom: connectBottom,
       );
     }
     if ((tabSettings.withFiles && appearNote.fileIds.isEmpty) || hide) {
@@ -150,6 +156,8 @@ class TimelineNote extends HookConsumerWidget {
       margin: margin,
       borderRadius: borderRadius,
       listViewKey: listViewKey,
+      connectTop: connectTop,
+      connectBottom: connectBottom,
     );
   }
 }

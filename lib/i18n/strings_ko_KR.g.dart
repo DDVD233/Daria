@@ -45,7 +45,7 @@ class Translations$aria$ko_KR extends Translations$aria$en_US {
 	final TranslationsKoKr _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Aria란';
+	@override String get aboutAria => 'Daria란';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
 		const TextSpan(text: '아리아는 '),
 		miria,
@@ -104,12 +104,12 @@ class Translations$aria$ko_KR extends Translations$aria$en_US {
 	@override String get fromDevice => '장치에서';
 	@override String get guest => '게스트';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria는 자원봉사자들에 의해 다양한 언어로 번역되고 있습니다. '),
+		const TextSpan(text: 'Daria는 자원봉사자들에 의해 다양한 언어로 번역되고 있습니다. '),
 		link,
 		const TextSpan(text: '에서 번역에 참가할 수 있습니다.'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Aria의 아이콘은 '),
+		const TextSpan(text: 'Daria의 아이콘은 '),
 		sevenc_nanashi,
 		const TextSpan(text: ' 가 제작했으며 '),
 		cc_by,
@@ -183,7 +183,7 @@ class Translations$aria$ko_KR extends Translations$aria$en_US {
 		const TextSpan(text: '님이 셀프-리노트함'),
 	]);
 	@override String get serverUrl => '서버 URL';
-	@override String get settingsFileForAria => 'Aria 설정 파일';
+	@override String get settingsFileForAria => 'Daria 설정 파일';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: ' 설정'),

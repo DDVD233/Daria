@@ -16,7 +16,6 @@ import 'package:aria/view/widget/media_list.dart';
 import 'package:aria/view/widget/note_footer.dart';
 import 'package:aria/view/widget/note_sheet.dart';
 import 'package:aria/view/widget/note_simple_widget.dart';
-import 'package:aria/view/widget/note_sub_widget.dart';
 import 'package:aria/view/widget/note_widget.dart';
 import 'package:aria/view/widget/poll_widget.dart';
 import 'package:aria/view/widget/reactions_viewer.dart';
@@ -124,11 +123,13 @@ void main() {
       },
     );
 
-    testWidgets('should show a placeholder if the reply target is not stored', (
-      tester,
-    ) async {
+    testWidgets('should not preview the reply target', (tester) async {
       const account = Account(host: 'misskey.tld');
-      final note = dummyNote.copyWith(id: 'test', replyId: 'reply');
+      final note = dummyNote.copyWith(
+        id: 'test',
+        text: 'note text',
+        replyId: 'reply',
+      );
       await setupWidget(
         tester,
         account: account,
@@ -141,7 +142,9 @@ void main() {
           ).overrideWithValue(true),
         ],
       );
-      expect(find.text(t.misskey.deletedNote), findsOne);
+      // The replied-to note is no longer previewed inline.
+      expect(find.text(t.misskey.deletedNote), findsNothing);
+      expect(find.textContaining('note text'), findsOne);
     });
   });
 
@@ -826,9 +829,15 @@ void main() {
   });
 
   group('reply', () {
-    testWidgets('should show reply', (tester) async {
+    testWidgets('should show a replying-to line instead of a preview', (
+      tester,
+    ) async {
       const account = Account(host: 'misskey.tld');
-      final reply = dummyNote.copyWith(id: 'reply', text: 'reply text');
+      final reply = dummyNote.copyWith(
+        id: 'reply',
+        text: 'reply text',
+        user: dummyUserLite.copyWith(username: 'replyuser'),
+      );
       final note = dummyNote.copyWith(
         id: 'test',
         text: 'note text',
@@ -844,10 +853,11 @@ void main() {
           noteNotifierProvider(account, reply.id).overrideWithValue(reply),
         ],
       );
-      expect(find.byType(NoteSubWidget), findsOne);
-      expect(find.text('reply text'), findsOne);
-      expect(find.byIcon(Icons.reply), findsExactly(2));
+      // The replied-to note is no longer previewed inline.
+      expect(find.text('reply text'), findsNothing);
       expect(find.textContaining('note text'), findsOne);
+      // A "replying to" line links to the replied-to note.
+      expect(find.byIcon(Icons.reply), findsWidgets);
       await tester.tap(find.byIcon(Icons.reply).first);
       await tester.pump(kDoubleTapTimeout);
       await tester.pumpAndSettle();

@@ -198,7 +198,7 @@ class AvatarDecorationDialog extends HookConsumerWidget {
                   icon: const Icon(Icons.refresh),
                 ),
               ),
-              SwitchListTile(
+              SwitchListTile.adaptive(
                 title: Text(t.misskey.flip),
                 value: flipH.value,
                 onChanged: (value) => flipH.value = value,

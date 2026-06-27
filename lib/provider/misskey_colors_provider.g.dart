@@ -66,7 +66,7 @@ final class MisskeyColorsProvider
   }
 }
 
-String _$misskeyColorsHash() => r'c4e4255aa62f9c870504bfc9a08578a1db95d27d';
+String _$misskeyColorsHash() => r'e1e8f2b5407dbc0eebeac37816e2d1cd3a8b8498';
 
 final class MisskeyColorsFamily extends $Family
     with $FunctionalFamilyOverride<MisskeyColors, Brightness> {

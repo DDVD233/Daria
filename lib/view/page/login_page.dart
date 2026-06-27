@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' hide launchUrl;
 
 import '../../constant/max_content_width.dart';
+import '../../gen/assets.gen.dart';
 import '../../i18n/strings.g.dart';
 import '../../provider/api/meta_notifier_provider.dart';
 import '../../provider/dio_provider.dart';
@@ -125,6 +126,7 @@ class LoginPage extends HookConsumerWidget {
         .split('/')
         .first;
     final server = servers.firstWhereOrNull((server) => server.url == host);
+    final isDefaultServer = host.toLowerCase() == 'dvd.chat';
     final iconUrl = switch (server?.meta) {
       {'iconUrl': final String iconUrl} when iconUrl.isNotEmpty => iconUrl,
       _ when server != null && server.icon =>
@@ -183,22 +185,41 @@ class LoginPage extends HookConsumerWidget {
                               color: Color(0xffdddddd),
                               shape: BoxShape.circle,
                             ),
-                            child: iconUrl != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(50.0),
-                                    child: ImageWidget(
+                            child: ClipOval(
+                              child: isDefaultServer
+                                  ? Assets.dvd.image(
+                                      width: 96.0,
+                                      height: 96.0,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : iconUrl != null
+                                  ? ImageWidget(
                                       url: iconUrl,
-                                      width: 50.0,
-                                      height: 50.0,
-                                    ),
-                                  )
-                                : const SizedBox.square(dimension: 50.0),
+                                      width: 96.0,
+                                      height: 96.0,
+                                    )
+                                  : const SizedBox.square(dimension: 96.0),
+                            ),
                           ),
-                          const SizedBox(height: 16.0),
+                          const SizedBox(height: 24.0),
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                start: 4.0,
+                                bottom: 6.0,
+                              ),
+                              child: Text(
+                                t.aria.serverUrl,
+                                style: Theme.of(context).textTheme.labelLarge,
+                              ),
+                            ),
+                          ),
                           MisskeyServerAutocomplete(
                             controller: controller,
                             focusNode: focusNode,
                             autofocus: true,
+                            showLabel: false,
                             onSubmitted: (host) => futureWithDialog(
                               context,
                               _launchMiAuth(ref, host),

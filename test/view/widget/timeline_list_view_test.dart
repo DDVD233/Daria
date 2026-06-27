@@ -1,5 +1,6 @@
 import 'package:aria/model/id.dart';
 import 'package:aria/model/tab_settings.dart';
+import 'package:aria/util/group_notes_into_threads.dart';
 import 'package:aria/view/widget/timeline_list_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:misskey_dart/misskey_dart.dart';
@@ -15,47 +16,53 @@ Note createDummyNote(int day, [int hour = 0]) {
   );
 }
 
-List<Note> createDummyNotes(int end, int start) {
-  return List.generate(end - start, (i) => createDummyNote(end - i));
+/// Standalone (unthreaded) display notes for the given days, newest-first.
+List<DisplayNote> createDummyDisplayNotes(int end, int start) {
+  return List.generate(
+    end - start,
+    (i) => DisplayNote(note: createDummyNote(end - i)),
+  );
 }
 
 void main() {
-  group('getNewNoteDividerIndex', () {
+  group('computeNewNotesDividerIndex', () {
+    final widget = TimelineListView(tabSettings: TabSettings.dummy());
+
     group(
       'should return null if the last viewed note is newer than the latest note',
       () {
         test('both', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(21).id,
-            nextNotes: createDummyNotes(20, 10),
-            previousNotes: createDummyNotes(10, 0),
+            nextDisplay: createDummyDisplayNotes(20, 10),
+            previousDisplay: createDummyDisplayNotes(10, 0),
           );
           expect(result, isNull);
         });
 
         test('next', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(21).id,
-            nextNotes: createDummyNotes(20, 10),
+            nextDisplay: createDummyDisplayNotes(20, 10),
+            previousDisplay: const [],
           );
           expect(result, isNull);
         });
 
         test('previous', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(11).id,
-            previousNotes: createDummyNotes(10, 0),
+            nextDisplay: const [],
+            previousDisplay: createDummyDisplayNotes(10, 0),
           );
           expect(result, isNull);
         });
 
         test('none', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(1).id,
+            nextDisplay: const [],
+            previousDisplay: const [],
           );
           expect(result, isNull);
         });
@@ -66,29 +73,28 @@ void main() {
       'should return null if the last viewed note is the same as the latest note',
       () {
         test('both', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(20).id,
-            nextNotes: createDummyNotes(20, 10),
-            previousNotes: createDummyNotes(10, 0),
+            nextDisplay: createDummyDisplayNotes(20, 10),
+            previousDisplay: createDummyDisplayNotes(10, 0),
           );
           expect(result, isNull);
         });
 
         test('next', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(20).id,
-            nextNotes: createDummyNotes(20, 10),
+            nextDisplay: createDummyDisplayNotes(20, 10),
+            previousDisplay: const [],
           );
           expect(result, isNull);
         });
 
         test('previous', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
+          final result = widget.computeNewNotesDividerIndex(
             lastViewedNoteId: createDummyNote(10).id,
-            previousNotes: createDummyNotes(10, 0),
+            nextDisplay: const [],
+            previousDisplay: createDummyDisplayNotes(10, 0),
           );
           expect(result, isNull);
         });
@@ -96,45 +102,42 @@ void main() {
     );
 
     group(
-      'should return index if the last viewed note is older than the latest note and newer than the oldest note',
+      'should return index if the last viewed note is older than the latest '
+      'note and newer than the oldest note',
       () {
         group('both', () {
           test(1, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(19).id,
-              nextNotes: createDummyNotes(20, 10),
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, 9);
           });
 
           test(2, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(10, 1).id,
-              nextNotes: createDummyNotes(20, 10),
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, 0);
           });
 
           test(3, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(10).id,
-              nextNotes: createDummyNotes(20, 10),
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, 0);
           });
 
           test(4, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(9).id,
-              nextNotes: createDummyNotes(20, 10),
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, -1);
           });
@@ -142,37 +145,19 @@ void main() {
 
         group('next', () {
           test(1, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(19, 1).id,
-              nextNotes: createDummyNotes(20, 10),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: const [],
             );
             expect(result, 9);
           });
 
           test(2, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
-              lastViewedNoteId: createDummyNote(19).id,
-              nextNotes: createDummyNotes(20, 10),
-            );
-            expect(result, 9);
-          });
-
-          test(3, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
-              lastViewedNoteId: createDummyNote(11, 1).id,
-              nextNotes: createDummyNotes(20, 10),
-            );
-            expect(result, 1);
-          });
-
-          test(4, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(11).id,
-              nextNotes: createDummyNotes(20, 10),
+              nextDisplay: createDummyDisplayNotes(20, 10),
+              previousDisplay: const [],
             );
             expect(result, 1);
           });
@@ -180,37 +165,19 @@ void main() {
 
         group('previous', () {
           test(1, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(9, 1).id,
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: const [],
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, -1);
           });
 
           test(2, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
-              lastViewedNoteId: createDummyNote(9).id,
-              previousNotes: createDummyNotes(10, 0),
-            );
-            expect(result, -1);
-          });
-
-          test(3, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
+            final result = widget.computeNewNotesDividerIndex(
               lastViewedNoteId: createDummyNote(1, 1).id,
-              previousNotes: createDummyNotes(10, 0),
-            );
-            expect(result, -9);
-          });
-
-          test(4, () {
-            final widget = TimelineListView(tabSettings: TabSettings.dummy());
-            final result = widget.getNewNoteDividerIndex(
-              lastViewedNoteId: createDummyNote(1).id,
-              previousNotes: createDummyNotes(10, 0),
+              nextDisplay: const [],
+              previousDisplay: createDummyDisplayNotes(10, 0),
             );
             expect(result, -9);
           });
@@ -218,37 +185,37 @@ void main() {
       },
     );
 
-    group(
-      'should return null if the last viewed note is newer than the latest note',
-      () {
-        test('both', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
-            lastViewedNoteId: createDummyNote(0).id,
-            nextNotes: createDummyNotes(20, 10),
-            previousNotes: createDummyNotes(10, 0),
-          );
-          expect(result, isNull);
-        });
+    group('places the divider between whole threads, never inside one', () {
+      // A thread [day12 -> day14] (positioned by its leaf, day14) sits between
+      // standalone day20 and standalone day11.
+      List<DisplayNote> nextWithThread() => [
+        DisplayNote(note: createDummyNote(20)),
+        DisplayNote(note: createDummyNote(12), connectBottom: true),
+        DisplayNote(note: createDummyNote(14), connectTop: true),
+        DisplayNote(note: createDummyNote(11)),
+      ];
 
-        test('next', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
-            lastViewedNoteId: createDummyNote(10).id,
-            nextNotes: createDummyNotes(20, 10),
-          );
-          expect(result, isNull);
-        });
+      test('boundary below a thread whose leaf is still new', () {
+        // Last viewed day13: the thread leaf (day14) is newer, so the divider
+        // lands above the next seen unit (day11), below the whole thread.
+        final result = widget.computeNewNotesDividerIndex(
+          lastViewedNoteId: createDummyNote(13).id,
+          nextDisplay: nextWithThread(),
+          previousDisplay: const [],
+        );
+        expect(result, 1);
+      });
 
-        test('previous', () {
-          final widget = TimelineListView(tabSettings: TabSettings.dummy());
-          final result = widget.getNewNoteDividerIndex(
-            lastViewedNoteId: createDummyNote(0).id,
-            previousNotes: createDummyNotes(10, 0),
-          );
-          expect(result, isNull);
-        });
-      },
-    );
+      test('boundary snaps above a thread whose leaf has been seen', () {
+        // Last viewed day14 (the thread leaf): the divider snaps above the
+        // thread root (day12) rather than between the two thread members.
+        final result = widget.computeNewNotesDividerIndex(
+          lastViewedNoteId: createDummyNote(14).id,
+          nextDisplay: nextWithThread(),
+          previousDisplay: const [],
+        );
+        expect(result, 3);
+      });
+    });
   });
 }

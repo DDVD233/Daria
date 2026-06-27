@@ -21,6 +21,7 @@ class SearchNotesNotifier extends _$SearchNotesNotifier {
     bool? localOnly,
     String? sinceId,
     String? untilId,
+    String? order,
   }) async* {
     final link = ref.keepAlive();
     Timer? timer;
@@ -41,19 +42,25 @@ class SearchNotesNotifier extends _$SearchNotesNotifier {
   }
 
   Future<Iterable<Note>> _fetchNotes({String? untilId}) async {
-    final notes = await ref
+    // `notes/search` supports an `order` parameter (e.g. "desc" = newest first)
+    // that the typed NotesSearchRequest doesn't carry, so post it directly.
+    final response = await ref
         .read(misskeyProvider(account))
-        .notes
-        .search(
-          NotesSearchRequest(
+        .apiService
+        .post<List<dynamic>>('notes/search', {
+          ...NotesSearchRequest(
             query: query,
             userId: userId,
             channelId: channelId,
             host: (localOnly ?? false) ? '.' : null,
             sinceId: sinceId,
             untilId: untilId,
-          ),
-        );
+          ).toJson(),
+          if (order != null) 'order': order,
+        });
+    final notes = response
+        .map((e) => Note.fromJson(e as Map<String, dynamic>))
+        .toList();
     ref.read(notesNotifierProvider(account).notifier).addAll(notes);
     if (untilId != null) {
       return notes.where((note) => note.id.compareTo(untilId) < 0);

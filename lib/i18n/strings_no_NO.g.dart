@@ -50,7 +50,7 @@ class _Translations$aria$no_NO extends Translations$aria$en_US {
 		const TextSpan(text: '?'),
 	]);
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria oversettes til flere språk av frivillige. Du kan hjelpe til på '),
+		const TextSpan(text: 'Daria oversettes til flere språk av frivillige. Du kan hjelpe til på '),
 		link,
 		const TextSpan(text: '.'),
 	]);

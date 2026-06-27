@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Aria
+Name=Daria
 Comment=Dive into the interplanetary microblogging platform 🚀
 Exec=aria
 Icon=${SNAP}/meta/gui/aria.png

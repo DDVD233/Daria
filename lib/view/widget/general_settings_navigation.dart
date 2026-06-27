@@ -87,11 +87,24 @@ class GeneralSettingsNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Single-account redesign: hide the multi-account entries.
+    // - "Tabs": the timelines are fixed (Home/Local/Social/Global).
+    // - "Accounts": the account selector / "Add account" page is redundant with
+    //   a single account; the account's own settings are reachable from the
+    //   account tile at the top of the settings page.
+    // The enum values and routes are kept so existing deep links don't break.
+    const hidden = {
+      GeneralSettingsDestination.tabs,
+      GeneralSettingsDestination.accounts,
+    };
+    final destinations = GeneralSettingsDestination.values
+        .where((destination) => !hidden.contains(destination))
+        .toList();
     return ListView(
       shrinkWrap: true,
       physics: physics,
       padding: EdgeInsets.zero,
-      children: GeneralSettingsDestination.values
+      children: destinations
           .mapIndexed(
             (index, destination) => rail
                 ? IconButtonTheme(
@@ -119,10 +132,7 @@ class GeneralSettingsNavigation extends StatelessWidget {
                         top: round && index == 0
                             ? const Radius.circular(8.0)
                             : Radius.zero,
-                        bottom:
-                            round &&
-                                index ==
-                                    GeneralSettingsDestination.values.length - 1
+                        bottom: round && index == destinations.length - 1
                             ? const Radius.circular(8.0)
                             : Radius.zero,
                       ),

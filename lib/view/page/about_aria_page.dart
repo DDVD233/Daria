@@ -58,7 +58,7 @@ class AboutAriaPage extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    const Text('Aria'),
+                    const Text('Daria'),
                     if (version != null && buildNumber != null)
                       Text(
                         '$version+$buildNumber',
@@ -276,7 +276,7 @@ class AboutAriaPage extends HookConsumerWidget {
                                 subtitle: Text(deviceInfo),
                               ),
                               ListTile(
-                                title: const Text('Aria'),
+                                title: const Text('Daria'),
                                 subtitle: Text(packageInfo),
                               ),
                             ],
@@ -286,7 +286,7 @@ class AboutAriaPage extends HookConsumerWidget {
                           ElevatedButton(
                             onPressed: () => copyToClipboard(
                               context,
-                              'Device: $deviceInfo\nAria: $packageInfo',
+                              'Device: $deviceInfo\nDaria: $packageInfo',
                             ),
                             child: Text(t.misskey.copy),
                           ),

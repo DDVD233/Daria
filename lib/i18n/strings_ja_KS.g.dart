@@ -45,7 +45,7 @@ class Translations$aria$ja_KS extends Translations$aria$en_US {
 	final TranslationsJaKs _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => 'Ariaってなんや？';
+	@override String get aboutAria => 'Dariaってなんや？';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		name,
 		const TextSpan(text: 'からのフォロー申請を許可してええか？'),
@@ -53,9 +53,9 @@ class Translations$aria$ja_KS extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => 'アクセストークンを更新したで';
 	@override String get accountAdded => 'アカウントを追加したで';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaは'),
+		const TextSpan(text: 'Dariaは'),
 		miria,
-		const TextSpan(text: 'のフォークやで。\nAriaのローカライゼーションは'),
+		const TextSpan(text: 'のフォークやで。\nDariaのローカライゼーションは'),
 		misskey,
 		const TextSpan(text: 'のローカライゼーションファイルを基にしとるで。\n両プロジェクトのコントリビューターの皆様、ほんまにおおきに！'),
 	]);
@@ -125,15 +125,16 @@ class Translations$aria$ja_KS extends Translations$aria$en_US {
 		const TextSpan(text: 'をフォローしてええか？'),
 	]);
 	@override String get font => 'フォント';
+	@override String get forYou => 'おすすめ';
 	@override String get fromDevice => '端末から';
 	@override String get guest => 'ゲスト';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaは有志がいろんな言語に訳しとるで。'),
+		const TextSpan(text: 'Dariaは有志がいろんな言語に訳しとるで。'),
 		link,
 		const TextSpan(text: 'で翻訳に協力したってやー。'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Ariaのアイコンは'),
+		const TextSpan(text: 'Dariaのアイコンは'),
 		sevenc_nanashi,
 		const TextSpan(text: 'によって作成され、'),
 		cc_by,
@@ -237,7 +238,7 @@ class Translations$aria$ja_KS extends Translations$aria$en_US {
 	@override String get sendMessageConfirm => 'このメッセージを送信してええか？';
 	@override String get server => 'サーバー';
 	@override String get serverUrl => 'サーバーのURL';
-	@override String get settingsFileForAria => 'Ariaの設定ファイル';
+	@override String get settingsFileForAria => 'Dariaの設定ファイル';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: 'の設定'),

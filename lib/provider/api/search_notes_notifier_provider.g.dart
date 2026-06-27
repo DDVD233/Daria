@@ -25,6 +25,7 @@ final class SearchNotesNotifierProvider
       bool? localOnly,
       String? sinceId,
       String? untilId,
+      String? order,
     })
     super.argument,
   }) : super(
@@ -61,7 +62,7 @@ final class SearchNotesNotifierProvider
 }
 
 String _$searchNotesNotifierHash() =>
-    r'f0814a3b239da44937b72c47f81048086eeee4cc';
+    r'7c3639bcd7508f919e6596ad915aed59899603c7';
 
 final class SearchNotesNotifierFamily extends $Family
     with
@@ -78,6 +79,7 @@ final class SearchNotesNotifierFamily extends $Family
             bool? localOnly,
             String? sinceId,
             String? untilId,
+            String? order,
           })
         > {
   SearchNotesNotifierFamily._()
@@ -97,6 +99,7 @@ final class SearchNotesNotifierFamily extends $Family
     bool? localOnly,
     String? sinceId,
     String? untilId,
+    String? order,
   }) => SearchNotesNotifierProvider._(
     argument: (
       account,
@@ -106,6 +109,7 @@ final class SearchNotesNotifierFamily extends $Family
       localOnly: localOnly,
       sinceId: sinceId,
       untilId: untilId,
+      order: order,
     ),
     from: this,
   );
@@ -126,6 +130,7 @@ abstract class _$SearchNotesNotifier
             bool? localOnly,
             String? sinceId,
             String? untilId,
+            String? order,
           });
   Account get account => _$args.$1;
   String get query => _$args.$2;
@@ -134,6 +139,7 @@ abstract class _$SearchNotesNotifier
   bool? get localOnly => _$args.localOnly;
   String? get sinceId => _$args.sinceId;
   String? get untilId => _$args.untilId;
+  String? get order => _$args.order;
 
   Stream<PaginationState<Note>> build(
     Account account,
@@ -143,6 +149,7 @@ abstract class _$SearchNotesNotifier
     bool? localOnly,
     String? sinceId,
     String? untilId,
+    String? order,
   });
   @$mustCallSuper
   @override
@@ -171,6 +178,7 @@ abstract class _$SearchNotesNotifier
         localOnly: _$args.localOnly,
         sinceId: _$args.sinceId,
         untilId: _$args.untilId,
+        order: _$args.order,
       ),
     );
   }

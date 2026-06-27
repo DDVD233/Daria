@@ -19,7 +19,7 @@ class TimelineNotesNotifier extends _$TimelineNotesNotifier {
     TabSettings tabSettings, {
     String? untilId,
   }) async* {
-    final response = await _fetchNotes(untilId: untilId, limit: 30);
+    final response = await _fetchNotes(untilId: untilId, limit: 100);
     yield PaginationState.fromIterable(response);
     if (response.isNotEmpty && response.length < 10) {
       await loadMore();

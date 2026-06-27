@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:misskey_dart/misskey_dart.dart';
+import 'package:misskey_dart/misskey_dart.dart' hide Clip;
 
 import '../../model/account.dart';
 import '../../provider/api/meta_notifier_provider.dart';
@@ -11,6 +10,8 @@ import '../../provider/server_url_notifier_provider.dart';
 import '../../util/safe_parse_color.dart';
 import 'image_widget.dart';
 
+/// A compact instance (server) badge: a small solid pill with the instance's
+/// favicon and name, sized to its content and clamped when the name is long.
 class InstanceTickerWidget extends ConsumerWidget {
   const InstanceTickerWidget({
     super.key,
@@ -39,109 +40,53 @@ class InstanceTickerWidget extends ConsumerWidget {
           )
         : faviconUrl;
     final style = DefaultTextStyle.of(context).style;
+    final name = instance != null
+        ? instance?.name ?? host ?? ''
+        : meta?.name ?? account.host;
+    final foreground = color.computeLuminance() > 0.5
+        ? Colors.black
+        : Colors.white;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4.0),
-        gradient: LinearGradient(
-          begin: AlignmentDirectional.centerStart,
-          end: AlignmentDirectional.centerEnd,
-          colors: [color, color, color.withValues(alpha: 0)],
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(4.0),
-        child: InkWell(
-          onTap: account.host.isNotEmpty
-              ? () => context.push('/$account/servers/${host ?? account.host}')
-              : null,
-          child: SizedBox(
-            width: double.infinity,
-            child: Row(
-              children: [
-                if (proxiedUrl != null || host == null) ...[
-                  ImageWidget(
-                    height: style.fontSize! + 2.0,
-                    url:
-                        (proxiedUrl ??
-                                ref
-                                    .watch(
-                                      serverUrlNotifierProvider(account.host),
-                                    )
-                                    .replace(pathSegments: ['favicon.ico']))
-                            .toString(),
-                  ),
-                  const SizedBox(width: 4.0),
-                ],
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(1.0),
-                    child: _ShadowText(
-                      text: instance != null
-                          ? instance?.name ?? host ?? ''
-                          : meta?.name ?? account.host,
-                      style: style.copyWith(height: 1.0),
-                    ),
-                  ),
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(6.0),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: account.host.isNotEmpty
+            ? () => context.push('/$account/servers/${host ?? account.host}')
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 1.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (proxiedUrl != null || host == null) ...[
+                ImageWidget(
+                  height: style.fontSize! + 2.0,
+                  url:
+                      (proxiedUrl ??
+                              ref
+                                  .watch(
+                                    serverUrlNotifierProvider(account.host),
+                                  )
+                                  .replace(pathSegments: ['favicon.ico']))
+                          .toString(),
                 ),
+                const SizedBox(width: 4.0),
               ],
-            ),
+              Flexible(
+                child: Text(
+                  name,
+                  style: style.copyWith(color: foreground, height: 1.0),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
-  }
-}
-
-class _ShadowText extends StatelessWidget {
-  const _ShadowText({required this.text, required this.style});
-
-  final String text;
-  final TextStyle style;
-
-  @override
-  Widget build(BuildContext context) {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      final style = this.style.apply(fontSizeDelta: -0.5);
-
-      return Stack(
-        children: [
-          Text(
-            text,
-            style: style.copyWith(
-              foreground: Paint()
-                ..color = Colors.black38
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = 2.0,
-            ),
-            softWrap: false,
-            overflow: TextOverflow.fade,
-            maxLines: 1,
-          ),
-          Text(
-            text,
-            style: style.copyWith(color: Colors.white),
-            softWrap: false,
-            overflow: TextOverflow.fade,
-            maxLines: 1,
-          ),
-        ],
-      );
-    } else {
-      return Text(
-        text,
-        style: style.copyWith(
-          color: Colors.white,
-          shadows: const [
-            Shadow(blurRadius: 2.0),
-            Shadow(blurRadius: 2.0),
-            Shadow(blurRadius: 2.0),
-          ],
-        ),
-        softWrap: false,
-        overflow: TextOverflow.fade,
-        maxLines: 1,
-      );
-    }
   }
 }

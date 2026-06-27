@@ -20,7 +20,7 @@ class AccountsPage extends HookConsumerWidget {
     final accounts = ref.watch(accountsNotifierProvider);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.accounts)),
+      title: Text(t.misskey.accounts),
       body: accounts.isEmpty
           ? Center(child: Text(t.aria.noAccounts))
           : ListTileTheme(

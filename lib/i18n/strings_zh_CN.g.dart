@@ -44,7 +44,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get aboutAria => '关于 Aria';
+	@override String get aboutAria => '关于 Daria';
 	@override TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
 		const TextSpan(text: '确认同意 '),
 		name,
@@ -53,9 +53,9 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String get accessTokenUpdated => '成功更新访问令牌';
 	@override String get accountAdded => '成功添加账户';
 	@override TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria 是 '),
+		const TextSpan(text: 'Daria 是 '),
 		miria,
-		const TextSpan(text: ' 的一个派生项目。\nAria 的本地化基于 '),
+		const TextSpan(text: ' 的一个派生项目。\nDaria 的本地化基于 '),
 		misskey,
 		const TextSpan(text: ' 的本地化文件。\n我们想要对这些项目的所有贡献者表示感谢。'),
 	]);
@@ -69,6 +69,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String get authenticated => '已认证';
 	@override String get avatarSize => '头像大小';
 	@override String get background => '背景';
+	@override String get boostWithAccount => '用此账号转发';
 	@override String get buttonTypes => '按钮类型';
 	@override String get cache => '缓存';
 	@override String get calculating => '计算中...';
@@ -127,15 +128,16 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 		const TextSpan(text: ' 吗？'),
 	]);
 	@override String get font => '字体';
+	@override String get forYou => '推荐';
 	@override String get fromDevice => '从设备';
 	@override String get guest => '游客';
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria 已经被志愿者们翻译成了各种语言。如果你也有兴趣，可以通过 '),
+		const TextSpan(text: 'Daria 已经被志愿者们翻译成了各种语言。如果你也有兴趣，可以通过 '),
 		link,
 		const TextSpan(text: ' 帮助翻译。'),
 	]);
 	@override TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'Aria 应用图标由 '),
+		const TextSpan(text: 'Daria 应用图标由 '),
 		sevenc_nanashi,
 		const TextSpan(text: ' 创作，采用 '),
 		cc_by,
@@ -149,6 +151,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String jumpTo({required Object x}) => '跳转到 ${x}';
 	@override String get keepOpen => '保持开启';
 	@override String get keepTimelinePosition => '记住上次浏览位置​';
+	@override String get likeWithAccount => '用此账号点赞';
 	@override String get lineHeight => '行高';
 	@override String get loadFromDrive => '从云盘加载';
 	@override String get loginWithAccessToken => '使用访问令牌登录';
@@ -216,6 +219,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String get pleaseCopyResponse => '请复制此回复';
 	@override String pleaseLoginAs({required Object user}) => '请以 ${user} 登录';
 	@override String get postConfirm => '确定要发布这条帖子吗？';
+	@override String get reactWithAccount => '用此账号回应';
 	@override String get reactionConfirm => '您确定要添加一个回应吗？';
 	@override String get recentlyUsedEmojis => '最近使用的表情';
 	@override TextSpan rejectFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
@@ -240,7 +244,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String get sendMessageConfirm => '确定要发送这条消息吗？';
 	@override String get server => '服务器';
 	@override String get serverUrl => '服务器地址';
-	@override String get settingsFileForAria => 'Aria 的配置文件';
+	@override String get settingsFileForAria => 'Daria 的配置文件';
 	@override TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [
 		user,
 		const TextSpan(text: ' 的设置'),

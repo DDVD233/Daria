@@ -72,7 +72,7 @@ class TagUsers extends HookConsumerWidget {
                       }
                     },
                   ),
-                  SwitchListTile(
+                  SwitchListTile.adaptive(
                     title: Text(t.misskey.localOnly),
                     value: localOnly.value,
                     onChanged: (value) => localOnly.value = value,

@@ -32,7 +32,7 @@ class EmojiPickerPage extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.emojiPicker)),
+      title: Text(t.misskey.emojiPicker),
       body: ListTileTheme.merge(
         tileColor: theme.colorScheme.surface,
         child: ListView(
@@ -80,7 +80,7 @@ class EmojiPickerPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.emojiPickerUseDialog),
                   value: settings.emojiPickerUseDialog,
                   onChanged: (value) => ref
@@ -98,7 +98,7 @@ class EmojiPickerPage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.emojiPickerAutofocus),
                   value: settings.emojiPickerAutofocus,
                   onChanged: (value) => ref

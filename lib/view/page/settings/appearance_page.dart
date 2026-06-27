@@ -47,7 +47,7 @@ class AppearancePage extends HookConsumerWidget {
     }
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.appearance)),
+      title: Text(t.misskey.appearance),
       body: ListTileTheme(
         data: ListTileThemeData(
           tileColor: Theme.of(context).colorScheme.surface,
@@ -71,7 +71,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.dataSaver_.media_.title),
                   subtitle: Text(t.misskey.dataSaver_.media_.description),
                   value: settings.dataSaverMedia,
@@ -90,7 +90,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.dataSaver_.avatar_.title),
                   subtitle: Text(t.misskey.dataSaver_.avatar_.description),
                   value: settings.dataSaverAvatar,
@@ -104,7 +104,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.dataSaver_.urlPreviewThumbnail_.title),
                   subtitle: Text(
                     t.misskey.dataSaver_.urlPreviewThumbnail_.description,
@@ -120,7 +120,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.disableDataSaverWhenOnWifi),
                   value: settings.disableDataSaverWhenOnWifi,
                   onChanged: (value) => ref
@@ -151,7 +151,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.reduceUiAnimation),
                   value: settings.reduceAnimation,
                   onChanged: (value) => ref
@@ -169,7 +169,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.disableShowingAnimatedImages),
                   value: settings.disableShowingAnimatedImages,
                   onChanged: (value) => ref
@@ -182,7 +182,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.enableEmojiFadeIn),
                   value: settings.enableEmojiFadeIn,
                   onChanged: (value) => ref
@@ -195,7 +195,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.forceShowAds),
                   value: settings.forceShowAds,
                   onChanged: (value) => ref
@@ -208,7 +208,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.misskey.useGroupedNotifications),
                   value: settings.useGroupedNotifications,
                   onChanged: (value) => ref
@@ -221,7 +221,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showOnlineStatus),
                   value: settings.showOnlineStatus,
                   onChanged: (value) => ref
@@ -252,7 +252,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showTimelineTabBarAtBottom),
                   value: settings.showTimelineTabBarAtBottom,
                   onChanged: (value) => ref
@@ -270,7 +270,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showMenuButtonInTabBar),
                   value: settings.showMenuButtonInTabBar,
                   onChanged: (value) => ref
@@ -283,7 +283,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showTabHeaderInOneLine),
                   value: settings.showTabHeaderInOneLine,
                   onChanged: (value) => ref
@@ -296,7 +296,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.alwaysShowTabHeader),
                   value: settings.alwaysShowTabHeader,
                   onChanged: (value) => ref
@@ -309,7 +309,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showTimelineLastViewedAt),
                   value: settings.showTimelineLastViewedAt,
                   onChanged: (value) => ref
@@ -322,7 +322,7 @@ class AppearancePage extends HookConsumerWidget {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
-                child: SwitchListTile(
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.showPopupOnNewNote),
                   value: settings.showPopupOnNewNote,
                   onChanged: (value) => ref
@@ -366,7 +366,7 @@ class AppearancePage extends HookConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.aria.showImageInNotification),
                     value: settings.showImageInNotification,
                     onChanged: (value) => Future.wait([
@@ -394,7 +394,7 @@ class AppearancePage extends HookConsumerWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: maxContentWidth,
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: Text(t.aria.showEmojiInReactionNotification),
                     value: settings.showEmojiInReactionNotification,
                     onChanged: (value) => Future.wait([

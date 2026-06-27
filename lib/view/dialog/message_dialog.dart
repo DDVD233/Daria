@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,7 +10,7 @@ Future<void> showMessageDialog(
   String message, {
   Widget icon = const Icon(Icons.error_outline),
 }) async {
-  await showDialog<void>(
+  await showAdaptiveDialog<void>(
     context: context,
     builder: (context) => MessageDialog(message: message, icon: icon),
   );
@@ -22,6 +24,19 @@ class MessageDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoAlertDialog(
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => context.pop(),
+            child: Text(t.misskey.gotIt),
+          ),
+        ],
+      );
+    }
+
     return AlertDialog(
       icon: IconTheme.merge(data: const IconThemeData(size: 36.0), child: icon),
       content: Text(message),

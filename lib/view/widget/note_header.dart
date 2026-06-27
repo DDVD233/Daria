@@ -9,28 +9,36 @@ import 'package:misskey_dart/misskey_dart.dart';
 import '../../extension/text_style_extension.dart';
 import '../../i18n/strings.g.dart';
 import '../../model/account.dart';
+import '../../model/general_settings.dart';
 import '../../provider/general_settings_notifier_provider.dart';
 import '../../provider/server_url_notifier_provider.dart';
 import '../../util/format_datetime.dart';
 import '../../util/punycode.dart';
 import 'bot_badge.dart';
 import 'image_widget.dart';
+import 'instance_ticker_widget.dart';
 import 'note_visibility_icon.dart';
 import 'time_widget.dart';
 import 'user_sheet.dart';
 import 'username_widget.dart';
 
 class NoteHeader extends HookConsumerWidget {
-  const NoteHeader({super.key, required this.account, required this.note});
+  const NoteHeader({
+    super.key,
+    required this.account,
+    required this.note,
+    this.showInstanceTicker = false,
+  });
 
   final Account account;
   final Note note;
+  final bool showInstanceTicker;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final showCreatedAt = ref.watch(
+    final (showCreatedAt, instanceTicker) = ref.watch(
       generalSettingsNotifierProvider.select(
-        (settings) => settings.showNoteCreatedAt,
+        (settings) => (settings.showNoteCreatedAt, settings.instanceTicker),
       ),
     );
     final host = useMemoized(
@@ -41,130 +49,183 @@ class NoteHeader extends HookConsumerWidget {
       [note.user.host],
     );
     final style = DefaultTextStyle.of(context).style;
+    final showTicker =
+        showInstanceTicker &&
+        switch (instanceTicker) {
+          InstanceTicker.none => false,
+          InstanceTicker.remote =>
+            note.user.instance != null && note.user.host != null,
+          InstanceTicker.always => true,
+        };
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: InkWell(
-              onTap: note.userId.isNotEmpty
-                  ? () => context.push('/$account/users/${note.userId}')
-                  : null,
-              onLongPress: () => showUserSheet(
-                context: context,
-                account: account,
-                userId: note.userId,
-              ),
-              child: UsernameWidget(
-                account: account,
-                user: note.user,
-                trailingSpans: [
-                  if (note.user.isBot)
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                        child: DefaultTextStyle.merge(
-                          style: style.apply(
-                            color: style.color?.withValues(alpha: 0.8),
-                            fontSizeFactor: 0.8,
-                          ),
-                          child: const BotBadge(
-                            textScaler: TextScaler.noScaling,
-                          ),
-                        ),
-                      ),
-                    ),
-                  const WidgetSpan(child: SizedBox(width: 4.0)),
-                  if (defaultTargetPlatform != TargetPlatform.linux)
-                    const TextSpan(text: Unicode.LRI),
-                  TextSpan(text: '@${note.user.username}'),
-                  if (note.user.host != null)
-                    TextSpan(
-                      text: '@$host',
-                      style: TextStyle(
-                        color: style.color?.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  if (defaultTargetPlatform != TargetPlatform.linux)
-                    const TextSpan(text: Unicode.PDI),
-                  const WidgetSpan(child: SizedBox(width: 2.0)),
-                  for (final role in note.user.badgeRoles)
-                    if (role case UserBadgeRole(:final iconUrl?))
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: Tooltip(
-                          message: role.name,
+        // Row 1: display name (left) and time + status icons (right).
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: InkWell(
+                  onTap: note.userId.isNotEmpty
+                      ? () => context.push('/$account/users/${note.userId}')
+                      : null,
+                  onLongPress: () => showUserSheet(
+                    context: context,
+                    account: account,
+                    userId: note.userId,
+                  ),
+                  child: UsernameWidget(
+                    account: account,
+                    user: note.user,
+                    trailingSpans: [
+                      if (note.user.isBot)
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 2.0,
                             ),
-                            child: ImageWidget(
-                              url:
-                                  (iconUrl.hasScheme
-                                          ? iconUrl
-                                          : ref
-                                                .watch(
-                                                  serverUrlNotifierProvider(
-                                                    account.host,
-                                                  ),
-                                                )
-                                                .resolveUri(iconUrl))
-                                      .toString(),
-                              height: style.lineHeight,
-                              opacity: style.color?.a ?? 1.0,
+                            child: DefaultTextStyle.merge(
+                              style: style.apply(
+                                color: style.color?.withValues(alpha: 0.8),
+                                fontSizeFactor: 0.8,
+                              ),
+                              child: const BotBadge(
+                                textScaler: TextScaler.noScaling,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                ],
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                      const WidgetSpan(child: SizedBox(width: 2.0)),
+                      for (final role in note.user.badgeRoles)
+                        if (role case UserBadgeRole(:final iconUrl?))
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Tooltip(
+                              message: role.name,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2.0,
+                                ),
+                                child: ImageWidget(
+                                  url:
+                                      (iconUrl.hasScheme
+                                              ? iconUrl
+                                              : ref
+                                                    .watch(
+                                                      serverUrlNotifierProvider(
+                                                        account.host,
+                                                      ),
+                                                    )
+                                                    .resolveUri(iconUrl))
+                                          .toString(),
+                                  height: style.lineHeight,
+                                  opacity: style.color?.a ?? 1.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
               ),
             ),
-          ),
+            const SizedBox(width: 4.0),
+            DefaultTextStyle.merge(
+              style: style.apply(fontSizeFactor: 0.9),
+              child: TimeWidget(
+                time: note.createdAt,
+                onTap: note.id.isNotEmpty
+                    ? () => context.push('/$account/notes/${note.id}')
+                    : null,
+                absolute: showCreatedAt,
+              ),
+            ),
+            IconTheme.merge(
+              data: IconThemeData(size: style.lineHeight * 0.9),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (note.updatedAt case final updatedAt?)
+                    Tooltip(
+                      message:
+                          '${t.misskey.edited}: '
+                          '${absoluteTime(updatedAt)}'
+                          '.${updatedAt.millisecond.toString().padLeft(3, '0')} '
+                          '(${relativeTime(updatedAt)})',
+                      child: const Icon(Icons.edit),
+                    ),
+                  if (note.visibility != NoteVisibility.public)
+                    NoteVisibilityIcon(visibility: note.visibility),
+                  if (note.localOnly)
+                    Tooltip(
+                      message: t.misskey.visibility_.disableFederation,
+                      child: const Icon(OffIcons.rocket),
+                    ),
+                  if (note.channel != null)
+                    Tooltip(
+                      message: t.misskey.channel,
+                      child: const Icon(Icons.tv),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 2.0),
-        DefaultTextStyle.merge(
-          style: style.apply(fontSizeFactor: 0.9),
-          child: TimeWidget(
-            time: note.createdAt,
-            onTap: note.id.isNotEmpty
-                ? () => context.push('/$account/notes/${note.id}')
-                : null,
-            absolute: showCreatedAt,
-          ),
-        ),
-        IconTheme.merge(
-          data: IconThemeData(size: style.lineHeight * 0.9),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (note.updatedAt case final updatedAt?)
-                Tooltip(
-                  message:
-                      '${t.misskey.edited}: '
-                      '${absoluteTime(updatedAt)}'
-                      '.${updatedAt.millisecond.toString().padLeft(3, '0')} '
-                      '(${relativeTime(updatedAt)})',
-                  child: const Icon(Icons.edit),
+        // Row 2: @username@host (left) and the instance badge (right).
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: InkWell(
+                  onTap: note.userId.isNotEmpty
+                      ? () => context.push('/$account/users/${note.userId}')
+                      : null,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        if (defaultTargetPlatform != TargetPlatform.linux)
+                          const TextSpan(text: Unicode.LRI),
+                        TextSpan(text: '@${note.user.username}'),
+                        if (host != null)
+                          TextSpan(
+                            text: '@$host',
+                            style: TextStyle(
+                              color: style.color?.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        if (defaultTargetPlatform != TargetPlatform.linux)
+                          const TextSpan(text: Unicode.PDI),
+                      ],
+                    ),
+                    style: style.apply(fontSizeFactor: 0.9),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
-              if (note.visibility != NoteVisibility.public)
-                NoteVisibilityIcon(visibility: note.visibility),
-              if (note.localOnly)
-                Tooltip(
-                  message: t.misskey.visibility_.disableFederation,
-                  child: const Icon(OffIcons.rocket),
+              ),
+            ),
+            if (showTicker) ...[
+              const SizedBox(width: 4.0),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160.0),
+                child: DefaultTextStyle.merge(
+                  style: style.apply(fontSizeFactor: 0.9),
+                  child: InstanceTickerWidget(
+                    account: account,
+                    instance: note.user.instance,
+                    host: note.user.host,
+                  ),
                 ),
-              if (note.channel != null)
-                Tooltip(
-                  message: t.misskey.channel,
-                  child: const Icon(Icons.tv),
-                ),
+              ),
             ],
-          ),
+          ],
         ),
       ],
     );

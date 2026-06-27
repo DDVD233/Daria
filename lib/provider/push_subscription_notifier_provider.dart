@@ -12,7 +12,7 @@ import 'web_push_key_set_notifier_provider.dart';
 
 part 'push_subscription_notifier_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class PushSubscriptionNotifier extends _$PushSubscriptionNotifier {
   @override
   String? build(Account account) {

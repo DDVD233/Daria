@@ -419,13 +419,14 @@ class Assets {
 
   static const AssetGenImage bird = AssetGenImage('assets/bird.webp');
   static const AssetGenImage cat = AssetGenImage('assets/cat.webp');
+  static const AssetGenImage dvd = AssetGenImage('assets/dvd.png');
   static const String flower = 'assets/flower.svg';
   static const $AssetsFontsGen fonts = $AssetsFontsGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsMisskeyGen misskey = $AssetsMisskeyGen();
 
   /// List of all assets
-  static List<dynamic> get values => [bird, cat, flower];
+  static List<dynamic> get values => [bird, cat, dvd, flower];
 }
 
 class AssetGenImage {

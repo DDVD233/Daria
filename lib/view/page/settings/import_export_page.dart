@@ -131,7 +131,7 @@ class ImportExportPage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.preferencesBackups)),
+      title: Text(t.misskey.preferencesBackups),
       body: ListTileTheme(
         tileColor: theme.colorScheme.surface,
         child: ListView(

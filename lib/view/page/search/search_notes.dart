@@ -47,6 +47,7 @@ class SearchNotes extends HookConsumerWidget {
         ? ref.watch(channelNotifierProvider(account, channelId.value!)).value
         : null;
     final localOnly = useState(this.channelId != null);
+    final newestFirst = useState(true);
     final sinceDate = useState<DateTime?>(null);
     final untilDate = useState<DateTime?>(null);
     final method = ref.watch(idGenMethodProvider(account)).value;
@@ -66,6 +67,7 @@ class SearchNotes extends HookConsumerWidget {
               localOnly: localOnly.value,
               sinceId: sinceId,
               untilId: untilId,
+              order: newestFirst.value ? 'desc' : null,
             ),
           )
         : null;
@@ -118,7 +120,12 @@ class SearchNotes extends HookConsumerWidget {
                 ),
                 children: [
                   const Divider(height: 1.0),
-                  SwitchListTile(
+                  SwitchListTile.adaptive(
+                    title: Text(t.misskey.order_.newest),
+                    value: newestFirst.value,
+                    onChanged: (value) => newestFirst.value = value,
+                  ),
+                  SwitchListTile.adaptive(
                     title: Text(t.misskey.localOnly),
                     value: localOnly.value,
                     onChanged: channelId.value == null
@@ -259,6 +266,7 @@ class SearchNotes extends HookConsumerWidget {
           localOnly: localOnly.value,
           sinceId: sinceId,
           untilId: untilId,
+          order: newestFirst.value ? 'desc' : null,
         ).future,
       ),
       loadMore: (skipError) => ref
@@ -271,6 +279,7 @@ class SearchNotes extends HookConsumerWidget {
               localOnly: localOnly.value,
               sinceId: sinceId,
               untilId: untilId,
+              order: newestFirst.value ? 'desc' : null,
             ).notifier,
           )
           .loadMore(skipError: skipError),

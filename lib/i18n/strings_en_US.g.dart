@@ -48,8 +48,8 @@ class Translations$aria$en_US {
 
 	// Translations
 
-	/// en-US: 'About Aria'
-	String get aboutAria => 'About Aria';
+	/// en-US: 'About Daria'
+	String get aboutAria => 'About Daria';
 
 	/// en-US: 'Are you sure that you want to accept the follow request from {name}?'
 	TextSpan acceptFollowRequestConfirm({required InlineSpan name}) => TextSpan(children: [
@@ -64,11 +64,11 @@ class Translations$aria$en_US {
 	/// en-US: 'Successfully added an account'
 	String get accountAdded => 'Successfully added an account';
 
-	/// en-US: 'Aria is a fork of {miria}. Localization of Aria is based on localization files of {misskey}. We would like to show our appreciation to all contributers of these projects.'
+	/// en-US: 'Daria is a fork of {miria}. Localization of Daria is based on localization files of {misskey}. We would like to show our appreciation to all contributers of these projects.'
 	TextSpan acknowledgements({required InlineSpan miria, required InlineSpan misskey}) => TextSpan(children: [
-		const TextSpan(text: 'Aria is a fork of '),
+		const TextSpan(text: 'Daria is a fork of '),
 		miria,
-		const TextSpan(text: '.\nLocalization of Aria is based on localization files of '),
+		const TextSpan(text: '.\nLocalization of Daria is based on localization files of '),
 		misskey,
 		const TextSpan(text: '.\nWe would like to show our appreciation to all contributers of these projects.'),
 	]);
@@ -102,6 +102,9 @@ class Translations$aria$en_US {
 
 	/// en-US: 'Background'
 	String get background => 'Background';
+
+	/// en-US: 'Boost with account'
+	String get boostWithAccount => 'Boost with account';
 
 	/// en-US: 'Button types'
 	String get buttonTypes => 'Button types';
@@ -151,6 +154,12 @@ class Translations$aria$en_US {
 
 	/// en-US: 'Default reaction'
 	String get defaultReaction => 'Default reaction';
+
+	/// en-US: 'Delete account'
+	String get deleteAccount => 'Delete account';
+
+	/// en-US: 'This opens your server's settings in a browser, where you can permanently delete your account. Continue?'
+	String get deleteAccountConfirm => 'This opens your server\'s settings in a browser, where you can permanently delete your account. Continue?';
 
 	/// en-US: '(one) {Do you want to delete {n} tab related to this account?} (other) {Do you want to delete {n} tabs related to this account?}'
 	String deleteAccountTabsConfirm({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
@@ -249,22 +258,25 @@ class Translations$aria$en_US {
 	/// en-US: 'Font'
 	String get font => 'Font';
 
+	/// en-US: 'For You'
+	String get forYou => 'For You';
+
 	/// en-US: 'From device'
 	String get fromDevice => 'From device';
 
 	/// en-US: 'Guest'
 	String get guest => 'Guest';
 
-	/// en-US: 'Aria is being translated into various languages by volunteers. You can help at {link}.'
+	/// en-US: 'Daria is being translated into various languages by volunteers. You can help at {link}.'
 	TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria is being translated into various languages by volunteers. You can help at '),
+		const TextSpan(text: 'Daria is being translated into various languages by volunteers. You can help at '),
 		link,
 		const TextSpan(text: '.'),
 	]);
 
-	/// en-US: 'The icon of Aria was created by {sevenc_nanashi} and is licensed under {cc_by}.'
+	/// en-US: 'The icon of Daria was created by {sevenc_nanashi} and is licensed under {cc_by}.'
 	TextSpan iconAttribution({required InlineSpan sevenc_nanashi, required InlineSpan cc_by}) => TextSpan(children: [
-		const TextSpan(text: 'The icon of Aria was created by '),
+		const TextSpan(text: 'The icon of Daria was created by '),
 		sevenc_nanashi,
 		const TextSpan(text: ' and is licensed under '),
 		cc_by,
@@ -294,6 +306,9 @@ class Translations$aria$en_US {
 
 	/// en-US: 'Keep timeline position'
 	String get keepTimelinePosition => 'Keep timeline position';
+
+	/// en-US: 'Like with account'
+	String get likeWithAccount => 'Like with account';
 
 	/// en-US: 'Line height'
 	String get lineHeight => 'Line height';
@@ -468,6 +483,9 @@ class Translations$aria$en_US {
 	/// en-US: 'Are you sure you want to post this note?'
 	String get postConfirm => 'Are you sure you want to post this note?';
 
+	/// en-US: 'React with account'
+	String get reactWithAccount => 'React with account';
+
 	/// en-US: 'Are you sure you want to add a reaction?'
 	String get reactionConfirm => 'Are you sure you want to add a reaction?';
 
@@ -490,6 +508,12 @@ class Translations$aria$en_US {
 	/// en-US: 'Renoted by {user}'
 	TextSpan renotedBy({required InlineSpan user}) => TextSpan(children: [
 		const TextSpan(text: 'Renoted by '),
+		user,
+	]);
+
+	/// en-US: 'Replying to {user}'
+	TextSpan replyingTo({required InlineSpan user}) => TextSpan(children: [
+		const TextSpan(text: 'Replying to '),
 		user,
 	]);
 
@@ -520,8 +544,8 @@ class Translations$aria$en_US {
 	/// en-US: 'Server URL'
 	String get serverUrl => 'Server URL';
 
-	/// en-US: 'Settings file for Aria'
-	String get settingsFileForAria => 'Settings file for Aria';
+	/// en-US: 'Settings file for Daria'
+	String get settingsFileForAria => 'Settings file for Daria';
 
 	/// en-US: 'Settings for {user}'
 	TextSpan settingsForUser({required InlineSpan user}) => TextSpan(children: [

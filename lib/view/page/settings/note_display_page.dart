@@ -67,7 +67,7 @@ class NoteDisplayPage extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     return GeneralSettingsScaffold(
-      appBar: AppBar(title: Text(t.misskey.displayOfNote)),
+      title: Text(t.misskey.displayOfNote),
       body: MultiSplitViewTheme(
         data: MultiSplitViewThemeData(
           dividerPainter: DividerPainters.grooved1(
@@ -98,7 +98,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.collapseRenotes),
                         subtitle: Text(t.misskey.collapseRenotesDescription),
                         value: settings.collapseRenotes,
@@ -157,7 +157,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.highlightSensitiveMedia),
                         value: settings.highlightSensitiveMedia,
                         onChanged: (value) => ref
@@ -176,7 +176,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.enableAnimatedMfm),
                         value: settings.animatedMfm,
                         onChanged: (value) => ref
@@ -194,7 +194,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.enableAdvancedMfm),
                         value: settings.advancedMfm,
                         onChanged: (value) => ref
@@ -213,7 +213,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showRepliesCount),
                         value: settings.showRepliesCount,
                         onChanged: (value) => ref
@@ -231,7 +231,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showRenotesCount),
                         value: settings.showRenotesCount,
                         onChanged: (value) => ref
@@ -244,7 +244,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.showReactionsCount),
                         value: settings.showReactionsCount,
                         onChanged: (value) => ref
@@ -257,7 +257,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showReactionsCountForEachTypes),
                         value: settings.showReactionsCountInReactionButton,
                         onChanged: (value) => ref
@@ -270,7 +270,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showGapBetweenNotesInTimeline),
                         value: settings.showGapBetweenNotesInTimeline,
                         onChanged: (value) => ref
@@ -283,7 +283,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.loadRawImages),
                         value: settings.loadRawImages,
                         onChanged: (value) => ref
@@ -335,7 +335,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showNoteCreatedAt),
                         value: settings.showNoteCreatedAt,
                         onChanged: (value) => ref
@@ -354,7 +354,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showAvatarsInNote),
                         value: settings.showAvatarsInNote,
                         onChanged: (value) => ref
@@ -372,7 +372,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showAvatarsInSubNote),
                         value: settings.showAvatarsInSubNote,
                         onChanged: (value) => ref
@@ -385,7 +385,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.squareAvatars),
                         value: settings.squareAvatars,
                         onChanged: (value) => ref
@@ -398,7 +398,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.showAvatarDecorations),
                         value: settings.showAvatarDecorations,
                         onChanged: (value) => ref
@@ -417,7 +417,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showQuoteButtonInNoteFooter),
                         value: settings.showQuoteButtonInNoteFooter,
                         onChanged: (value) => ref
@@ -435,7 +435,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showLikeButtonInNoteFooter),
                         value: settings.showLikeButtonInNoteFooter,
                         onChanged: (value) => ref
@@ -448,7 +448,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.misskey.showClipButtonInNoteFooter),
                         value: settings.showClipButtonInNoteFooter,
                         onChanged: (value) => ref
@@ -461,7 +461,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showTranslateButtonInNoteFooter),
                         value: settings.showTranslateButtonInNoteFooter,
                         onChanged: (value) => ref
@@ -474,7 +474,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showNoteReactionsViewer),
                         value: settings.showNoteReactionsViewer,
                         onChanged: (value) => ref
@@ -487,7 +487,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showNoteFooter),
                         value: settings.showNoteFooter,
                         onChanged: (value) => ref
@@ -500,7 +500,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showSubNoteReactionsViewer),
                         value: settings.showSubNoteReactionsViewer,
                         onChanged: (value) => ref
@@ -513,7 +513,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.showSubNoteFooter),
                         value: settings.showSubNoteFooter,
                         onChanged: (value) => ref
@@ -526,7 +526,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.alwaysExpandCw),
                         value: settings.alwaysExpandCw,
                         onChanged: (value) => ref
@@ -539,7 +539,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.alwaysExpandLongNote),
                         value: settings.alwaysExpandLongNote,
                         onChanged: (value) => ref
@@ -552,7 +552,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.alwaysExpandMediaInSubNote),
                         value: settings.alwaysExpandMediaInSubNote,
                         onChanged: (value) => ref
@@ -565,7 +565,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.mergeReactionsByName),
                         value: settings.mergeReactionsByName,
                         onChanged: (value) => ref
@@ -578,7 +578,7 @@ class NoteDisplayPage extends HookConsumerWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
                       width: maxContentWidth,
-                      child: SwitchListTile(
+                      child: SwitchListTile.adaptive(
                         title: Text(t.aria.alwaysShowAllReactions),
                         value: settings.alwaysShowAllReactions,
                         onChanged: (value) => ref

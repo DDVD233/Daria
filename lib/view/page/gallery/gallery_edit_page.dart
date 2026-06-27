@@ -137,7 +137,7 @@ class GalleryEditPage extends HookConsumerWidget {
               label: Text(t.misskey.attachFile),
             ),
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             title: Text(t.misskey.markAsSensitive),
             value: isSensitive.value,
             onChanged: (value) => isSensitive.value = value,

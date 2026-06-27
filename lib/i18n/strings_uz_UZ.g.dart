@@ -49,7 +49,7 @@ class _Translations$aria$uz_UZ extends Translations$aria$en_US {
 		const TextSpan(text: ' ga obuna bo\'lmoqchimisiz?'),
 	]);
 	@override TextSpan i18nInfo({required InlineSpan link}) => TextSpan(children: [
-		const TextSpan(text: 'Aria bir qancha volontyorlar yordamida bir qancha tillarga tarjima qilingan. Ushbu '),
+		const TextSpan(text: 'Daria bir qancha volontyorlar yordamida bir qancha tillarga tarjima qilingan. Ushbu '),
 		link,
 		const TextSpan(text: ' orqali ularga yordam berishingiz mumkin.'),
 	]);

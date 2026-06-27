@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +11,7 @@ Future<void> showErrorMessageDialog(
   Object? error,
   StackTrace? stackTrace,
 }) async {
-  await showDialog<void>(
+  await showAdaptiveDialog<void>(
     context: context,
     builder: (context) =>
         ErrorMessageDialog(error: error, stackTrace: stackTrace),
@@ -24,6 +26,25 @@ class ErrorMessageDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoAlertDialog(
+        title: Text(t.misskey.error),
+        // [ErrorMessage] uses Material widgets (ListTile/InkWell/TextButton),
+        // so give it a Material ancestor inside the Cupertino dialog.
+        content: Material(
+          type: MaterialType.transparency,
+          child: ErrorMessage(error: error, stackTrace: stackTrace),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => context.pop(),
+            child: Text(t.misskey.gotIt),
+          ),
+        ],
+      );
+    }
+
     return AlertDialog(
       title: Text(t.misskey.error),
       scrollable: true,

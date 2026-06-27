@@ -208,7 +208,7 @@ class _LayerSheet extends HookConsumerWidget {
             icon: const Icon(Icons.refresh),
           ),
         ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.misskey.flip),
           value: layer.flipX,
           onChanged: (value) => ref

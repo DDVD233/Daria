@@ -126,12 +126,12 @@ class DriveCreateSheet extends HookConsumerWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.misskey.keepOriginalUploading),
           value: keepOriginalUploading.value,
           onChanged: (value) => keepOriginalUploading.value = value,
         ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.misskey.keepOriginalFilename),
           value: keepOriginalFilename.value,
           onChanged: (value) => keepOriginalFilename.value = value,

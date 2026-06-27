@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,7 +13,7 @@ Future<bool> confirm(
   String? okText,
   String? cancelText,
 }) async {
-  final result = await showDialog<bool>(
+  final result = await showAdaptiveDialog<bool>(
     context: context,
     builder: (context) => ConfirmationDialog(
       title: title,
@@ -42,6 +44,25 @@ class ConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Native iOS alert; Android keeps the original Material dialog untouched.
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoAlertDialog(
+        title: title,
+        content: content ?? Text(message ?? ''),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => context.pop(true),
+            child: Text(okText ?? t.misskey.ok),
+          ),
+          CupertinoDialogAction(
+            onPressed: () => context.pop(false),
+            child: Text(cancelText ?? t.misskey.cancel),
+          ),
+        ],
+      );
+    }
+
     final theme = Theme.of(context);
 
     return AlertDialog(

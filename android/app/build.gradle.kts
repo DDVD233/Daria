@@ -1,9 +1,19 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Local release signing: read android/app/key.properties if present, otherwise
+// fall back to environment variables (the path CI uses).
+val keystoreProperties = Properties().apply {
+    val keystorePropertiesFile = rootProject.file("app/key.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -18,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.poppingmoon.aria"
+        applicationId = "chat.dvd.daria"
         minSdk = flutter.minSdkVersion
         multiDexEnabled = true
         targetSdk = flutter.targetSdkVersion
@@ -28,10 +38,10 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            keyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+            keyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
             storeFile = file("upload.keystore")
-            storePassword = System.getenv("STORE_PASSWORD")
+            storePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
         }
     }
 

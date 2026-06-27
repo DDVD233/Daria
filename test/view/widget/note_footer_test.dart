@@ -111,14 +111,18 @@ void main() {
     testWidgets('should show 5 buttons for a public note', (tester) async {
       const account = Account(host: 'misskey.tld');
       await setupWidget(tester, account: account, note: dummyNote);
-      expect(find.byType(Icon), findsExactly(5));
+      // 6 buttons: reply, renote, quote, like, add-reaction, menu.
+      // (The like button shows by default — showLikeButtonInNoteFooter: true.)
+      expect(find.byType(Icon), findsExactly(6));
     });
 
     testWidgets('should show 4 buttons for a private note', (tester) async {
       const account = Account(host: 'misskey.tld');
       final note = dummyNote.copyWith(visibility: NoteVisibility.followers);
       await setupWidget(tester, account: account, note: note);
-      expect(find.byType(Icon), findsExactly(4));
+      // 5 buttons: reply, cant-renote, like, add-reaction, menu.
+      // (The like button shows by default — showLikeButtonInNoteFooter: true.)
+      expect(find.byType(Icon), findsExactly(5));
     });
   });
 
@@ -690,10 +694,17 @@ void main() {
   });
 
   group('like', () {
-    testWidgets('should not show a like button', (tester) async {
+    testWidgets('should not show a like button if disabled', (tester) async {
       const account = Account(host: 'misskey.tld');
       final note = dummyNote.copyWith(id: 'test');
-      await setupWidget(tester, account: account, note: note);
+      await setupWidget(
+        tester,
+        account: account,
+        note: note,
+        generalSettings: const GeneralSettings(
+          showLikeButtonInNoteFooter: false,
+        ),
+      );
       expect(find.byIcon(Icons.favorite_border), findsNothing);
     });
 
@@ -705,14 +716,7 @@ void main() {
         id: 'test',
         reactionAcceptance: ReactionAcceptance.likeOnly,
       );
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(
-          showLikeButtonInNoteFooter: true,
-        ),
-      );
+      await setupWidget(tester, account: account, note: note);
       expect(find.byIcon(Icons.favorite_border), findsOne);
       expect(find.byIcon(Icons.add), findsNothing);
     });
@@ -722,14 +726,7 @@ void main() {
     ) async {
       const account = Account(host: 'misskey.tld');
       final note = dummyNote.copyWith(id: 'test', myReaction: '❤');
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(
-          showLikeButtonInNoteFooter: true,
-        ),
-      );
+      await setupWidget(tester, account: account, note: note);
       expect(find.byIcon(Icons.favorite_border), findsNothing);
     });
 
@@ -738,14 +735,7 @@ void main() {
       (tester) async {
         const account = Account(host: 'misskey.tld');
         final note = dummyNote.copyWith(id: 'test');
-        await setupWidget(
-          tester,
-          account: account,
-          note: note,
-          generalSettings: const GeneralSettings(
-            showLikeButtonInNoteFooter: true,
-          ),
-        );
+        await setupWidget(tester, account: account, note: note);
         await tester.tap(find.byIcon(Icons.favorite_border));
         await tester.pumpAndSettle();
         expect(find.byType(ReactionConfirmationDialog), findsNothing);
@@ -756,14 +746,7 @@ void main() {
       'should not show a reaction confirmation on tap for a dummy note if enabled',
       (tester) async {
         const account = Account(host: 'misskey.tld', username: 'testuser');
-        await setupWidget(
-          tester,
-          account: account,
-          note: dummyNote,
-          generalSettings: const GeneralSettings(
-            showLikeButtonInNoteFooter: true,
-          ),
-        );
+        await setupWidget(tester, account: account, note: dummyNote);
         await tester.tap(find.byIcon(Icons.favorite_border));
         await tester.pumpAndSettle();
         expect(find.byType(ReactionConfirmationDialog), findsNothing);
@@ -779,9 +762,7 @@ void main() {
         tester,
         account: account,
         note: note,
-        generalSettings: const GeneralSettings(
-          showLikeButtonInNoteFooter: true,
-        ),
+        generalSettings: const GeneralSettings(confirmBeforeReact: true),
       );
       await tester.tap(find.byIcon(Icons.favorite_border));
       await tester.pumpAndSettle();
@@ -811,16 +792,7 @@ void main() {
         ),
         data: {'noteId': 'renote'},
       );
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(
-          showLikeButtonInNoteFooter: true,
-          confirmBeforeReact: false,
-        ),
-        dio: dio,
-      );
+      await setupWidget(tester, account: account, note: note, dio: dio);
       await tester.tap(find.byIcon(Icons.favorite_border));
       await tester.pumpAndSettle();
       expect(
@@ -863,16 +835,7 @@ void main() {
         ),
         data: {'noteId': 'test'},
       );
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(
-          showLikeButtonInNoteFooter: true,
-          confirmBeforeReact: false,
-        ),
-        dio: dio,
-      );
+      await setupWidget(tester, account: account, note: note, dio: dio);
       await tester.tap(find.byIcon(Icons.favorite_border));
       await tester.pumpAndSettle();
       expect(
@@ -999,7 +962,15 @@ void main() {
         ),
         data: {'noteId': 'test'},
       );
-      await setupWidget(tester, account: account, note: note, dio: dio);
+      // Pin the reaction confirmation on so this test still exercises the
+      // confirm dialog (the default is confirmBeforeReact: false).
+      await setupWidget(
+        tester,
+        account: account,
+        note: note,
+        dio: dio,
+        generalSettings: const GeneralSettings(confirmBeforeReact: true),
+      );
       await tester.tap(find.byIcon(Icons.add));
       await tester.pumpAndSettle();
       tester.element(find.byType(EmojiPicker)).pop(':test:');
@@ -1038,13 +1009,7 @@ void main() {
         ),
         data: {'noteId': 'renote'},
       );
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(confirmBeforeReact: false),
-        dio: dio,
-      );
+      await setupWidget(tester, account: account, note: note, dio: dio);
       await tester.tap(find.byIcon(Icons.add));
       await tester.pumpAndSettle();
       tester.element(find.byType(EmojiPicker)).pop(':test:');
@@ -1089,13 +1054,7 @@ void main() {
         ),
         data: {'noteId': 'test'},
       );
-      await setupWidget(
-        tester,
-        account: account,
-        note: note,
-        generalSettings: const GeneralSettings(confirmBeforeReact: false),
-        dio: dio,
-      );
+      await setupWidget(tester, account: account, note: note, dio: dio);
       await tester.tap(find.byIcon(Icons.add));
       await tester.pumpAndSettle();
       tester.element(find.byType(EmojiPicker)).pop(':test:');

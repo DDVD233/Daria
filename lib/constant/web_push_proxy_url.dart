@@ -1,1 +1,1 @@
-const webPushProxyUrl = 'https://web-push-proxy.poppingmoon.workers.dev';
+const webPushProxyUrl = 'https://web-push-proxy.dvdaria.workers.dev';

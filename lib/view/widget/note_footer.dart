@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,6 +14,7 @@ import '../../i18n/strings.g.dart';
 import '../../model/account.dart';
 import '../../model/sound_settings.dart';
 import '../../provider/account_settings_notifier_provider.dart';
+import '../../provider/accounts_notifier_provider.dart';
 import '../../provider/api/i_notifier_provider.dart';
 import '../../provider/api/meta_notifier_provider.dart';
 import '../../provider/api/misskey_provider.dart';
@@ -24,16 +24,23 @@ import '../../provider/misskey_sfx_notifier_provider.dart';
 import '../../provider/notes_notifier_provider.dart';
 import '../../provider/post_notifier_provider.dart';
 import '../../util/future_with_dialog.dart';
+import '../../util/haptics.dart';
 import '../../util/launch_url.dart';
 import '../dialog/clip_dialog.dart';
 import '../dialog/confirmation_dialog.dart';
 import '../dialog/reaction_confirmation_dialog.dart';
+import 'account_popover.dart';
 import 'emoji_picker.dart';
 import 'note_sheet.dart';
+import 'react_with_account.dart';
 import 'reaction_users_sheet.dart';
 import 'renote_sheet.dart';
 import 'renote_users_sheet.dart';
 import 'translated_note_sheet.dart';
+
+/// Fires a light haptic to confirm a post operation (reply/renote/reaction),
+/// honoring the global [enableHapticFeedback] setting.
+void _postHapticFeedback(WidgetRef ref) => hapticLight(ref);
 
 class NoteFooter extends ConsumerWidget {
   const NoteFooter({
@@ -217,6 +224,7 @@ class _ReplyButton extends ConsumerWidget {
       onPressed: !account.isGuest
           ? () {
               if (note.id.isEmpty) return;
+              _postHapticFeedback(ref);
               ref.read(postNotifierProvider(account).notifier).setReply(note);
               if (focusPostForm case final focusPostForm?) {
                 focusPostForm();
@@ -270,6 +278,11 @@ class _RenoteButton extends HookConsumerWidget {
     final myRenotingNoteId = useState(this.myRenotingNoteId);
     final isRenoted =
         myRenotingNoteId.value != null || (note.isRenoted ?? false);
+    // With more than one account, always route through the renote sheet so the
+    // "boost with account" selector is reachable, even when quoting is disabled.
+    final hasMultipleAccounts = ref.watch(
+      accountsNotifierProvider.select((accounts) => accounts.length > 1),
+    );
     final colors = ref.watch(
       misskeyColorsProvider(Theme.of(context).brightness),
     );
@@ -278,7 +291,7 @@ class _RenoteButton extends HookConsumerWidget {
       onLongPress: note.renoteCount > 0
           ? () {
               if (note.id.isEmpty) return;
-              HapticFeedback.lightImpact();
+              hapticLight(ref);
               showModalBottomSheet<void>(
                 context: context,
                 builder: (context) =>
@@ -348,7 +361,8 @@ class _RenoteButton extends HookConsumerWidget {
                     }
                   }
                 }
-                if (showQuoteButton) {
+                _postHapticFeedback(ref);
+                if (showQuoteButton || hasMultipleAccounts) {
                   final result = await showModalBottomSheet<Note>(
                     context: context,
                     builder: (context) =>
@@ -439,46 +453,77 @@ class _LikeButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      tooltip: t.misskey.like,
-      onPressed: !account.isGuest
-          ? () async {
+    return GestureDetector(
+      onLongPress: !account.isGuest
+          ? () {
               if (note.id.isEmpty) return;
-              final defaultReaction = ref
-                  .read(accountSettingsNotifierProvider(account))
-                  .defaultReaction;
-              final emoji = defaultReaction ?? '❤';
-              if (ref
-                  .read(generalSettingsNotifierProvider)
-                  .confirmBeforeReact) {
-                final confirmed = await confirmReaction(
-                  ref.context,
-                  account: account,
-                  emoji: emoji,
+              final box = context.findRenderObject() as RenderBox?;
+              final at = box != null && box.hasSize
+                  ? box.localToGlobal(box.size.center(Offset.zero))
+                  : Offset.zero;
+              final emoji =
+                  ref
+                      .read(accountSettingsNotifierProvider(account))
+                      .defaultReaction ??
+                  '❤';
+              unawaited(
+                reactWithAccountOrShowUsers(
+                  context,
+                  ref,
+                  source: account,
                   note: note,
-                );
-                if (!confirmed) return;
-              }
-              final context = ref.context.mounted
-                  ? ref.context
-                  : listViewKey?.currentContext;
-              if (context == null || !context.mounted) return;
-              ref
-                  .read(
-                    misskeySfxNotifierProvider(OperationType.reaction).notifier,
-                  )
-                  .play()
-                  .ignore();
-              await futureWithDialog(
-                context,
-                ref
-                    .read(notesNotifierProvider(account).notifier)
-                    .react(note.id, emoji),
-                overlay: false,
+                  emoji: emoji,
+                  at: at,
+                  title: t.aria.likeWithAccount,
+                ),
               );
             }
           : null,
-      icon: const Icon(Icons.favorite_border),
+      child: IconButton(
+        // No tooltip: on mobile a tooltip hijacks the long-press (which we use
+        // for "like with account").
+        onPressed: !account.isGuest
+            ? () async {
+                if (note.id.isEmpty) return;
+                final defaultReaction = ref
+                    .read(accountSettingsNotifierProvider(account))
+                    .defaultReaction;
+                final emoji = defaultReaction ?? '❤';
+                if (ref
+                    .read(generalSettingsNotifierProvider)
+                    .confirmBeforeReact) {
+                  final confirmed = await confirmReaction(
+                    ref.context,
+                    account: account,
+                    emoji: emoji,
+                    note: note,
+                  );
+                  if (!confirmed) return;
+                }
+                final context = ref.context.mounted
+                    ? ref.context
+                    : listViewKey?.currentContext;
+                if (context == null || !context.mounted) return;
+                _postHapticFeedback(ref);
+                ref
+                    .read(
+                      misskeySfxNotifierProvider(
+                        OperationType.reaction,
+                      ).notifier,
+                    )
+                    .play()
+                    .ignore();
+                await futureWithDialog(
+                  context,
+                  ref
+                      .read(notesNotifierProvider(account).notifier)
+                      .react(note.id, emoji),
+                  overlay: false,
+                );
+              }
+            : null,
+        icon: const Icon(Icons.favorite_border),
+      ),
     );
   }
 }
@@ -496,6 +541,59 @@ class _AddReactionButton extends ConsumerWidget {
   final TextStyle? style;
   final GlobalKey? listViewKey;
 
+  /// Long-press: with more than one usable account, pick the account to react as
+  /// (at the press position) then choose an emoji; otherwise fall back to the
+  /// note-level "who reacted" sheet.
+  Future<void> _onLongPress(BuildContext context, WidgetRef ref) async {
+    if (note.id.isEmpty) return;
+    final box = context.findRenderObject() as RenderBox?;
+    final at = box != null && box.hasSize
+        ? box.localToGlobal(box.size.center(Offset.zero))
+        : Offset.zero;
+    final candidates = ref
+        .read(accountsNotifierProvider)
+        .where((acct) => !note.localOnly || acct.host == account.host)
+        .toList();
+    if (candidates.length < 2) {
+      if ((note.reactionCount ?? 0) <= 0) return;
+      hapticLight(ref);
+      await showModalBottomSheet<void>(
+        context: context,
+        builder: (context) => ReactionUsersSheet(
+          account: account,
+          noteId: note.id,
+          initialReaction: note.reactions.entries.fold<(String?, int)>((
+            null,
+            0,
+          ), (acc, e) => acc.$2 < e.value ? (e.key, e.value) : acc).$1,
+        ),
+        clipBehavior: Clip.antiAlias,
+        isScrollControlled: true,
+      );
+      return;
+    }
+    final target = await selectAccountAt(
+      context,
+      at: at,
+      current: account,
+      candidates: candidates,
+      title: t.aria.reactWithAccount,
+    );
+    if (target == null || !context.mounted) return;
+    final emoji = note.reactionAcceptance == ReactionAcceptance.likeOnly
+        ? '❤'
+        : await pickEmoji(ref, target, reaction: true, targetNote: note);
+    if (emoji == null || !context.mounted) return;
+    await reactAs(
+      context,
+      ref,
+      source: account,
+      target: target,
+      note: note,
+      emoji: emoji,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showReactionsCount = ref.watch(
@@ -505,31 +603,10 @@ class _AddReactionButton extends ConsumerWidget {
     );
 
     return GestureDetector(
-      onLongPress: (note.reactionCount ?? 0) > 0
-          ? () {
-              if (note.id.isEmpty) return;
-              HapticFeedback.lightImpact();
-              showModalBottomSheet<void>(
-                context: context,
-                builder: (context) => ReactionUsersSheet(
-                  account: account,
-                  noteId: note.id,
-                  initialReaction: note.reactions.entries.fold<(String?, int)>((
-                    null,
-                    0,
-                  ), (acc, e) => acc.$2 < e.value ? (e.key, e.value) : acc).$1,
-                ),
-                clipBehavior: Clip.antiAlias,
-                isScrollControlled: true,
-              );
-            }
-          : null,
+      onLongPress: () => unawaited(_onLongPress(context, ref)),
       child: IconButton(
-        tooltip: (note.reactionCount ?? 0) <= 0
-            ? note.reactionAcceptance == ReactionAcceptance.likeOnly
-                  ? t.misskey.like
-                  : t.misskey.reaction
-            : null,
+        // No tooltip: on mobile a tooltip hijacks the long-press (which we use
+        // for "react with account").
         onPressed: !account.isGuest
             ? () async {
                 if (note.id.isEmpty) return;
@@ -563,6 +640,7 @@ class _AddReactionButton extends ConsumerWidget {
                     if (!confirmed) return;
                   }
                   if (!context.mounted) return;
+                  _postHapticFeedback(ref);
                   ref
                       .read(
                         misskeySfxNotifierProvider(
@@ -630,7 +708,7 @@ class _RemoveReactionButton extends ConsumerWidget {
     return GestureDetector(
       onLongPress: () {
         if (note.id.isEmpty) return;
-        HapticFeedback.lightImpact();
+        hapticLight(ref);
         showModalBottomSheet<void>(
           context: context,
           builder: (context) => ReactionUsersSheet(

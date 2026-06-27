@@ -764,7 +764,7 @@ class ProfilePage extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(6.0),
                   ),
                   children: [
-                    SwitchListTile(
+                    SwitchListTile.adaptive(
                       title: Text(t.misskey.flagAsCat),
                       subtitle: Text(t.misskey.flagAsCatDescription),
                       value: i.isCat,
@@ -775,7 +775,7 @@ class ProfilePage extends HookConsumerWidget {
                             .setIsCat(value),
                       ),
                     ),
-                    SwitchListTile(
+                    SwitchListTile.adaptive(
                       title: Text(t.misskey.flagAsBot),
                       subtitle: Text(t.misskey.flagAsBotDescription),
                       value: i.isBot,

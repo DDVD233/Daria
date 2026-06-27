@@ -45,12 +45,12 @@ body:
 
         Examples:
           * Model and OS of the device(s): Pixel 7a, Android 14
-          * Aria: 1.x.x+x
+          * Daria: 1.x.x+x
           * Server URL: misskey.io
           * Misskey: 2024.x.x
       value: |
         * Model and OS of the device(s):
-        * Aria:
+        * Daria:
         * Server URL:
         * Misskey:
       render: markdown

@@ -61,12 +61,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_apns_only: 3d91c0ca9dbef4439874858590909a19f8ed06a4
-  flutter_image_compress_common: ec1d45c362c9d30a3f6a0426c297f47c52007e3e
-  image_editor_common: d6f6644ae4a6de80481e89fe6d0a8c49e30b4b43
+  flutter_apns_only: bd278c53433cb01cd66152843f7247fe10b9a9ea
+  flutter_image_compress_common: 1697a328fd72bfb335507c6bca1a65fa5ad87df1
+  image_editor_common: 3de87e7c4804f4ae24c8f8a998362b98c105cac1
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
-  receive_sharing_intent: 79c848f5b045674ad60b9fea3bafea59962ad2c1
+  receive_sharing_intent: 222384f00ffe7e952bbfabaa9e3967cb87e5fe00
   SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
 
