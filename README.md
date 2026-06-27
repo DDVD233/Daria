@@ -12,6 +12,14 @@ fork of [Miria](https://github.com/shiosyakeyakini-info/miria). The main focus o
 this fork is deeper optimization for [dvd.chat](https://dvd.chat), together with a
 number of complementary server-side changes.
 
+## Download
+
+| Android       | iOS | Windows | macOS | Linux |
+| ------------- | --- | ------- | ----- | ----- |
+| [APK][GitHub] |     |         |       |       |
+
+[GitHub]: https://github.com/DDVD233/Daria/releases/latest
+
 ## Icon
 
 The Daria icon is based on the original Aria icon, which was created by
