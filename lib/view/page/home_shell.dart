@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,6 +48,15 @@ class HomeShell extends HookConsumerWidget {
     // avoids the Search tab's auto-focusing field grabbing focus at launch.
     final visited = useRef(<int>{0});
 
+    // Drives the show/hide of the top and bottom bars as the timeline is
+    // scrolled (Android only). 1.0 = fully shown, 0.0 = hidden.
+    final barsController = useAnimationController(
+      duration: const Duration(milliseconds: 200),
+      initialValue: 1.0,
+    );
+    // Only Android auto-hides the bars on scroll; elsewhere they stay fixed.
+    final autoHideBars = defaultTargetPlatform == TargetPlatform.android;
+
     // Guard against the brief window after sign out where the account list is
     // empty but the router redirect to /login has not run yet.
     if (account == null) {
@@ -62,13 +72,70 @@ class HomeShell extends HookConsumerWidget {
     Widget destination(int i) {
       if (!visited.value.contains(i)) return const SizedBox.shrink();
       return switch (i) {
-        0 => _TimelinesTab(account: account),
+        0 => _TimelinesTab(
+          account: account,
+          barsAnimation: autoHideBars ? barsController : null,
+        ),
         1 => SearchPage(account: account),
         2 => NotificationsPage(account: account),
-        3 => ExplorePage(account: account),
+        3 => ExplorePage(
+          account: account,
+          barsAnimation: autoHideBars ? barsController : null,
+        ),
         _ => _MoreTab(account: account),
       };
     }
+
+    // Reveal or hide the bars based on the active timeline's vertical scroll
+    // direction. Horizontal swipes (e.g. between timelines) are ignored.
+    bool handleScroll(ScrollNotification notification) {
+      if (notification.metrics.axis != Axis.vertical) return false;
+      if (notification is UserScrollNotification) {
+        final direction = notification.direction;
+        if (direction == ScrollDirection.reverse) {
+          // Scrolling down: hide, unless bouncing at the very top.
+          if (notification.metrics.pixels >
+              notification.metrics.minScrollExtent) {
+            unawaited(barsController.reverse());
+          }
+        } else if (direction == ScrollDirection.forward) {
+          unawaited(barsController.forward()); // Scrolling up: reveal.
+        }
+      } else if (notification is ScrollUpdateNotification) {
+        // Always show the bars once back at the top.
+        if (notification.metrics.pixels <=
+            notification.metrics.minScrollExtent) {
+          unawaited(barsController.forward());
+        }
+      }
+      return false;
+    }
+
+    final body = IndexedStack(
+      index: index.value,
+      children: [for (var i = 0; i < 5; i++) destination(i)],
+    );
+
+    final navBar = _AdaptiveNavBar(
+      selectedIndex: index.value,
+      onSelect: (value) {
+        // Re-tapping the already-selected Explore destination refreshes the
+        // "For You" feed (scroll to top + re-request recommendations).
+        if (value == index.value && value == 3) {
+          ref.read(forYouReselectProvider(account).notifier).notifyReselect();
+        }
+        // A light selection tick when moving to a different tab (honours the
+        // global haptic-feedback setting).
+        if (value != index.value) {
+          hapticSelection(ref);
+        }
+        // Make sure the bars are visible again whenever the tab changes.
+        unawaited(barsController.forward());
+        visited.value.add(value);
+        index.value = value;
+      },
+      hasUnreadNotification: hasUnreadNotification,
+    );
 
     return Scaffold(
       // On iOS, let the tab content extend behind the bottom navigation bar so
@@ -76,32 +143,24 @@ class HomeShell extends HookConsumerWidget {
       // scrolling underneath. Left off on Material, whose [NavigationBar] is
       // opaque, so content would just be hidden behind it.
       extendBody: defaultTargetPlatform == TargetPlatform.iOS,
-      body: IndexedStack(
-        index: index.value,
-        children: [for (var i = 0; i < 5; i++) destination(i)],
-      ),
+      body: autoHideBars
+          ? NotificationListener<ScrollNotification>(
+              onNotification: handleScroll,
+              child: body,
+            )
+          : body,
       floatingActionButton: index.value == 0
           ? _ComposeFab(account: account)
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: _AdaptiveNavBar(
-        selectedIndex: index.value,
-        onSelect: (value) {
-          // Re-tapping the already-selected Explore destination refreshes the
-          // "For You" feed (scroll to top + re-request recommendations).
-          if (value == index.value && value == 3) {
-            ref.read(forYouReselectProvider(account).notifier).notifyReselect();
-          }
-          // A light selection tick when moving to a different tab (honours the
-          // global haptic-feedback setting).
-          if (value != index.value) {
-            hapticSelection(ref);
-          }
-          visited.value.add(value);
-          index.value = value;
-        },
-        hasUnreadNotification: hasUnreadNotification,
-      ),
+      // Collapse the bottom nav downward as the timeline is scrolled down.
+      bottomNavigationBar: autoHideBars
+          ? SizeTransition(
+              sizeFactor: barsController,
+              alignment: Alignment.bottomCenter,
+              child: navBar,
+            )
+          : navBar,
     );
   }
 }
@@ -109,9 +168,13 @@ class HomeShell extends HookConsumerWidget {
 /// The Home tab: the 3 swipeable timelines (Home, Local, Social) bound
 /// to the single current account.
 class _TimelinesTab extends HookConsumerWidget {
-  const _TimelinesTab({required this.account});
+  const _TimelinesTab({required this.account, this.barsAnimation});
 
   final Account account;
+
+  /// When non-null (Android), the top bar collapses/expands with this
+  /// animation as the timeline is scrolled. When null, the bar is fixed.
+  final Animation<double>? barsAnimation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -125,31 +188,49 @@ class _TimelinesTab extends HookConsumerWidget {
     );
     final controller = useTabController(initialLength: 3, keys: [account]);
 
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 64.0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0, top: 8.0),
-          child: Center(child: _ProfileAvatarButton(account: account)),
-        ),
-        titleSpacing: 0.0,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: TabBar(
-            controller: controller,
-            tabs: [
-              Tab(text: t.misskey.timelines_.home),
-              Tab(text: t.misskey.timelines_.local),
-              Tab(text: t.misskey.timelines_.social),
-            ],
-          ),
+    final appBar = AppBar(
+      toolbarHeight: 64.0,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12.0, top: 8.0),
+        child: Center(child: _ProfileAvatarButton(account: account)),
+      ),
+      titleSpacing: 0.0,
+      title: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: TabBar(
+          controller: controller,
+          tabs: [
+            Tab(text: t.misskey.timelines_.home),
+            Tab(text: t.misskey.timelines_.local),
+            Tab(text: t.misskey.timelines_.social),
+          ],
         ),
       ),
-      body: TabBarView(
-        controller: controller,
+    );
+
+    final body = TabBarView(
+      controller: controller,
+      children: [
+        for (final tabSettings in tabs)
+          TimelineListView(tabSettings: tabSettings),
+      ],
+    );
+
+    final barsAnimation = this.barsAnimation;
+    if (barsAnimation == null) {
+      return Scaffold(appBar: appBar, body: body);
+    }
+    // Android: collapse the top bar upward as the timeline is scrolled down.
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final tabSettings in tabs)
-            TimelineListView(tabSettings: tabSettings),
+          SizeTransition(
+            sizeFactor: barsAnimation,
+            alignment: Alignment.topCenter,
+            child: appBar,
+          ),
+          Expanded(child: body),
         ],
       ),
     );
