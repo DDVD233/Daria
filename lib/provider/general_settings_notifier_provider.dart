@@ -660,6 +660,11 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     await _save();
   }
 
+  Future<void> setAutoHideBars(bool autoHideBars) async {
+    state = state.copyWith(autoHideBars: autoHideBars);
+    await _save();
+  }
+
   Future<void> setThemeMode(ThemeMode themeMode) async {
     state = state.copyWith(themeMode: themeMode);
     await _save();

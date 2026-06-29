@@ -178,13 +178,14 @@ _GeneralSettings _$GeneralSettingsFromJson(
       (json['timelinesPageMinFlingFactor'] as num?)?.toDouble() ??
       defaultTimelinesPageMinFlingFactor,
   enableHapticFeedback: json['enableHapticFeedback'] as bool? ?? true,
+  autoHideBars: json['autoHideBars'] as bool? ?? true,
   themeMode:
       $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
       ThemeMode.system,
   lightThemeId:
-      json['lightThemeId'] as String? ?? 'a58a0abb-ff8c-476a-8dec-0ad7837e7e96',
+      json['lightThemeId'] as String? ?? '213273e5-7d20-d5f0-6e36-1b6a4f67115c',
   darkThemeId:
-      json['darkThemeId'] as String? ?? '66e7e5a9-cd43-42cd-837d-12f47841fa34',
+      json['darkThemeId'] as String? ?? 'c503d768-7c70-4db2-a4e6-08264304bc8d',
   sound: json['sound'] == null
       ? const SoundSettings()
       : SoundSettings.fromJson(json['sound'] as Map<String, dynamic>),
@@ -311,6 +312,7 @@ Map<String, dynamic> _$GeneralSettingsToJson(
   'timelinesPageSpringStiffness': instance.timelinesPageSpringStiffness,
   'timelinesPageMinFlingFactor': instance.timelinesPageMinFlingFactor,
   'enableHapticFeedback': instance.enableHapticFeedback,
+  'autoHideBars': instance.autoHideBars,
   'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
   'lightThemeId': instance.lightThemeId,
   'darkThemeId': instance.darkThemeId,

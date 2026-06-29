@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,8 +16,9 @@ import '../../provider/accounts_notifier_provider.dart';
 import '../../provider/api/endpoints_notifier_provider.dart';
 import '../../provider/api/i_notifier_provider.dart';
 import '../../provider/current_account_provider.dart';
-import '../../provider/for_you_reselect_provider.dart';
+import '../../provider/general_settings_notifier_provider.dart';
 import '../../provider/misskey_colors_provider.dart';
+import '../../provider/tab_reselect_provider.dart';
 import '../../util/account_sign_out.dart';
 import '../../util/haptics.dart';
 import '../dialog/confirmation_dialog.dart';
@@ -49,13 +49,22 @@ class HomeShell extends HookConsumerWidget {
     final visited = useRef(<int>{0});
 
     // Drives the show/hide of the top and bottom bars as the timeline is
-    // scrolled (Android only). 1.0 = fully shown, 0.0 = hidden.
+    // scrolled (when enabled). 1.0 = fully shown, 0.0 = hidden. Driven directly
+    // from the scroll offset (not an implicit animation) so the bars track the
+    // finger; only the snap-on-release is animated.
     final barsController = useAnimationController(
       duration: const Duration(milliseconds: 200),
       initialValue: 1.0,
     );
-    // Only Android auto-hides the bars on scroll; elsewhere they stay fixed.
-    final autoHideBars = defaultTargetPlatform == TargetPlatform.android;
+    // Last seen scroll offset-from-top and the last per-frame delta, used to
+    // drive the bars and to decide the snap direction on release.
+    final lastExtentBefore = useRef<double?>(null);
+    final lastScrollDelta = useRef<double>(0.0);
+    // Auto-hide the top/bottom bars on scroll when enabled (default on, both
+    // platforms); toggled in Settings → Behavior.
+    final autoHideBars = ref.watch(
+      generalSettingsNotifierProvider.select((s) => s.autoHideBars),
+    );
 
     // Guard against the brief window after sign out where the account list is
     // empty but the router redirect to /login has not run yet.
@@ -86,27 +95,54 @@ class HomeShell extends HookConsumerWidget {
       };
     }
 
-    // Reveal or hide the bars based on the active timeline's vertical scroll
-    // direction. Horizontal swipes (e.g. between timelines) are ignored.
+    // Scroll distance over which the bars fully hide. Matches the active tab's
+    // top-bar height so the top bar tracks its scrollable spacer exactly.
+    final span =
+        MediaQuery.viewPaddingOf(context).top +
+        switch (index.value) {
+          0 => 64.0, // Home: AppBar toolbarHeight
+          3 => kToolbarHeight + 46.0, // Explore: toolbar + tab bar
+          _ => kToolbarHeight,
+        };
+
+    // Drive the bars continuously from the scroll offset so the scroll itself
+    // stays fully user-controlled (horizontal swipes between tabs are ignored).
+    // The bars track the finger; only the snap-on-release is animated.
     bool handleScroll(ScrollNotification notification) {
       if (notification.metrics.axis != Axis.vertical) return false;
-      if (notification is UserScrollNotification) {
-        final direction = notification.direction;
-        if (direction == ScrollDirection.reverse) {
-          // Scrolling down: hide, unless bouncing at the very top.
-          if (notification.metrics.pixels >
-              notification.metrics.minScrollExtent) {
-            unawaited(barsController.reverse());
-          }
-        } else if (direction == ScrollDirection.forward) {
-          unawaited(barsController.forward()); // Scrolling up: reveal.
+      if (notification is ScrollUpdateNotification ||
+          notification is OverscrollNotification) {
+        final extentBefore = notification.metrics.extentBefore;
+        final last = lastExtentBefore.value;
+        if (last != null) lastScrollDelta.value = extentBefore - last;
+        if (extentBefore <= span) {
+          // Near the top: tie visibility to the offset so the bars track the
+          // scrollable spacer exactly (no gap; hides from the very first pixel).
+          barsController.value = (1.0 - extentBefore / span).clamp(0.0, 1.0);
+        } else {
+          // Past the spacer: float — every bit of scroll nudges the bars.
+          final delta = last != null ? extentBefore - last : 0.0;
+          barsController.value = (barsController.value - delta / span).clamp(
+            0.0,
+            1.0,
+          );
         }
-      } else if (notification is ScrollUpdateNotification) {
-        // Always show the bars once back at the top.
-        if (notification.metrics.pixels <=
-            notification.metrics.minScrollExtent) {
-          unawaited(barsController.forward());
-        }
+        lastExtentBefore.value = extentBefore;
+      } else if (notification is ScrollEndNotification) {
+        // Snap on release: always reveal near the top (avoids a gap) or when the
+        // last movement was upward; otherwise hide.
+        final target = notification.metrics.extentBefore <= span
+            ? 1.0
+            : (lastScrollDelta.value > 0.0 ? 0.0 : 1.0);
+        unawaited(
+          barsController.animateTo(
+            target,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          ),
+        );
+        lastExtentBefore.value = null;
+        lastScrollDelta.value = 0.0;
       }
       return false;
     }
@@ -116,21 +152,37 @@ class HomeShell extends HookConsumerWidget {
       children: [for (var i = 0; i < 5; i++) destination(i)],
     );
 
+    // Full height of the bottom navigation bar (content + safe-area inset), used
+    // to slide it fully off-screen when hidden. Material [NavigationBar] is 80,
+    // [CupertinoTabBar] is 50.
+    final navBarHeight =
+        (defaultTargetPlatform == TargetPlatform.iOS ? 50.0 : 80.0) +
+        MediaQuery.viewPaddingOf(context).bottom;
+
     final navBar = _AdaptiveNavBar(
       selectedIndex: index.value,
       onSelect: (value) {
-        // Re-tapping the already-selected Explore destination refreshes the
-        // "For You" feed (scroll to top + re-request recommendations).
-        if (value == index.value && value == 3) {
-          ref.read(forYouReselectProvider(account).notifier).notifyReselect();
-        }
-        // A light selection tick when moving to a different tab (honours the
-        // global haptic-feedback setting).
-        if (value != index.value) {
+        if (value == index.value) {
+          // Re-tapping the active destination scrolls its visible content to
+          // the top, then refreshes on a further tap once already at the top.
+          // The per-tab page routes the signal to the visible sub-tab.
+          final slot = switch (value) {
+            0 => ReselectSlot.home,
+            2 => ReselectSlot.notifications,
+            3 => ReselectSlot.explore,
+            _ => null,
+          };
+          if (slot != null) {
+            ref.read(tabReselectProvider(account, slot).notifier).notify();
+          }
+        } else {
+          // A light selection tick when moving to a different tab (honours the
+          // global haptic-feedback setting).
           hapticSelection(ref);
         }
         // Make sure the bars are visible again whenever the tab changes.
         unawaited(barsController.forward());
+        lastExtentBefore.value = null;
         visited.value.add(value);
         index.value = value;
       },
@@ -138,11 +190,12 @@ class HomeShell extends HookConsumerWidget {
     );
 
     return Scaffold(
-      // On iOS, let the tab content extend behind the bottom navigation bar so
-      // [CupertinoTabBar]'s native translucent backdrop blur reveals the content
-      // scrolling underneath. Left off on Material, whose [NavigationBar] is
-      // opaque, so content would just be hidden behind it.
-      extendBody: defaultTargetPlatform == TargetPlatform.iOS,
+      // Let the tab content extend behind the bottom navigation bar. On iOS this
+      // reveals [CupertinoTabBar]'s translucent blur; when auto-hiding, it also
+      // lets the bar slide away over the content without resizing — and so
+      // re-laying out — the timeline every frame. Left off only on Material with
+      // a fixed, opaque bar, where content would just be hidden behind it.
+      extendBody: defaultTargetPlatform == TargetPlatform.iOS || autoHideBars,
       body: autoHideBars
           ? NotificationListener<ScrollNotification>(
               onNotification: handleScroll,
@@ -153,11 +206,17 @@ class HomeShell extends HookConsumerWidget {
           ? _ComposeFab(account: account)
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      // Collapse the bottom nav downward as the timeline is scrolled down.
+      // Slide the bottom nav off the bottom as the timeline is scrolled down.
+      // The slot keeps a constant height (only the child is translated), so the
+      // body's constraints never change — the move is a GPU-composited layer
+      // offset, not a per-frame re-layout.
       bottomNavigationBar: autoHideBars
-          ? SizeTransition(
-              sizeFactor: barsController,
-              alignment: Alignment.bottomCenter,
+          ? AnimatedBuilder(
+              animation: barsController,
+              builder: (context, child) => Transform.translate(
+                offset: Offset(0.0, (1.0 - barsController.value) * navBarHeight),
+                child: child,
+              ),
               child: navBar,
             )
           : navBar,
@@ -172,8 +231,8 @@ class _TimelinesTab extends HookConsumerWidget {
 
   final Account account;
 
-  /// When non-null (Android), the top bar collapses/expands with this
-  /// animation as the timeline is scrolled. When null, the bar is fixed.
+  /// When non-null, the top bar collapses/expands with this animation as the
+  /// timeline is scrolled. When null, the bar is fixed.
   final Animation<double>? barsAnimation;
 
   @override
@@ -187,6 +246,17 @@ class _TimelinesTab extends HookConsumerWidget {
       [account],
     );
     final controller = useTabController(initialLength: 3, keys: [account]);
+
+    // Re-tapping the Home destination fans the signal out to the visible
+    // timeline (scroll to top, then refresh).
+    ref.listen(tabReselectProvider(account, ReselectSlot.home), (_, _) {
+      final slot = switch (controller.index) {
+        0 => ReselectSlot.homeTimeline,
+        1 => ReselectSlot.localTimeline,
+        _ => ReselectSlot.socialTimeline,
+      };
+      ref.read(tabReselectProvider(account, slot).notifier).notify();
+    });
 
     final appBar = AppBar(
       toolbarHeight: 64.0,
@@ -208,29 +278,65 @@ class _TimelinesTab extends HookConsumerWidget {
       ),
     );
 
-    final body = TabBarView(
-      controller: controller,
-      children: [
-        for (final tabSettings in tabs)
-          TimelineListView(tabSettings: tabSettings),
-      ],
-    );
+    const slots = [
+      ReselectSlot.homeTimeline,
+      ReselectSlot.localTimeline,
+      ReselectSlot.socialTimeline,
+    ];
 
     final barsAnimation = this.barsAnimation;
     if (barsAnimation == null) {
-      return Scaffold(appBar: appBar, body: body);
+      return Scaffold(
+        appBar: appBar,
+        body: TabBarView(
+          controller: controller,
+          children: [
+            for (final (i, tabSettings) in tabs.indexed)
+              TimelineListView(
+                tabSettings: tabSettings,
+                reselectSlot: slots[i],
+              ),
+          ],
+        ),
+      );
     }
-    // Android: collapse the top bar upward as the timeline is scrolled down.
+    // Overlay the top bar on full-bleed content so the timeline never resizes as
+    // the bar hides — the scroll stays entirely user-controlled. A scrollable
+    // [TimelineListView.topInset] spacer keeps notes clear of the bar when shown.
+    final topBarHeight =
+        appBar.preferredSize.height + MediaQuery.paddingOf(context).top;
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          SizeTransition(
-            sizeFactor: barsAnimation,
-            alignment: Alignment.topCenter,
-            child: appBar,
+          Positioned.fill(
+            child: TabBarView(
+              controller: controller,
+              children: [
+                for (final (i, tabSettings) in tabs.indexed)
+                  TimelineListView(
+                    tabSettings: tabSettings,
+                    reselectSlot: slots[i],
+                    topInset: topBarHeight,
+                  ),
+              ],
+            ),
           ),
-          Expanded(child: body),
+          Positioned(
+            top: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: AnimatedBuilder(
+              animation: barsAnimation,
+              builder: (context, child) => Transform.translate(
+                offset: Offset(
+                  0.0,
+                  -(1.0 - barsAnimation.value) * topBarHeight,
+                ),
+                child: child,
+              ),
+              child: appBar,
+            ),
+          ),
         ],
       ),
     );

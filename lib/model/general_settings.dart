@@ -155,11 +155,12 @@ abstract class GeneralSettings with _$GeneralSettings {
     @Default(defaultTimelinesPageMinFlingFactor)
     double timelinesPageMinFlingFactor,
     @Default(true) bool enableHapticFeedback,
+    @Default(true) bool autoHideBars,
 
     // Theme
     @Default(ThemeMode.system) ThemeMode themeMode,
-    @Default('a58a0abb-ff8c-476a-8dec-0ad7837e7e96') String lightThemeId,
-    @Default('66e7e5a9-cd43-42cd-837d-12f47841fa34') String darkThemeId,
+    @Default('213273e5-7d20-d5f0-6e36-1b6a4f67115c') String lightThemeId,
+    @Default('c503d768-7c70-4db2-a4e6-08264304bc8d') String darkThemeId,
 
     // Sounds
     @Default(SoundSettings()) SoundSettings sound,

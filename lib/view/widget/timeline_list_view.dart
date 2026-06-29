@@ -28,6 +28,7 @@ import '../../util/reload_timeline.dart';
 import 'haptic_feedback_refresh_indicator.dart';
 import 'notifications_list_view.dart';
 import 'pagination_bottom_widget.dart';
+import 'tab_reselect.dart';
 import 'timeline_note.dart';
 
 class TimelineListView extends HookConsumerWidget {
@@ -37,12 +38,23 @@ class TimelineListView extends HookConsumerWidget {
     this.nested = false,
     this.focusPostForm,
     this.lastViewedAtKey,
+    this.reselectSlot,
+    this.topInset = 0.0,
   });
 
   final TabSettings tabSettings;
   final bool nested;
   final void Function()? focusPostForm;
   final Key? lastViewedAtKey;
+
+  /// Height of a scrollable spacer prepended at the top of the list. Lets the
+  /// content scroll out from under an overlaying, auto-hiding top bar without
+  /// the notes being obscured when the bar is shown.
+  final double topInset;
+
+  /// When set, the list listens to [tabReselectProvider] for this slot and, on
+  /// re-tap of its owning tab, scrolls to the top or refreshes if already there.
+  final String? reselectSlot;
 
   /// Computes where to place the "new notes" divider in the reordered
   /// (threaded) display lists.
@@ -92,12 +104,36 @@ class TimelineListView extends HookConsumerWidget {
     final controller = nested
         ? PrimaryScrollController.of(context)
         : ref.watch(timelineScrollControllerProvider(tabSettings));
+    final refreshKey = useMemoized(
+      () => GlobalKey<RefreshIndicatorState>(),
+      [],
+    );
     if (tabSettings.tabType == TabType.notifications) {
+      // Delegates entirely to the notifications list, which handles its own
+      // re-select behaviour.
       return NotificationsListView(
         account: tabSettings.account,
         controller: controller,
+        reselectSlot: reselectSlot,
       );
     }
+    listenTabReselect(
+      ref,
+      account: tabSettings.account,
+      slot: reselectSlot,
+      controller: controller,
+      refreshKey: refreshKey,
+    );
+    // This is a center-anchored viewport, so the zero scroll offset sits at the
+    // center pivot — on first load (no newer notes) the feed rests there with
+    // the first note at the very top, which an overlaying top bar would cover. A
+    // leading spacer sliver alone can't fix it (it lives above the pivot, off
+    // screen at rest). Placing the zero offset `topInset` down — matching the
+    // spacer's height — keeps the first note clear of the bar both at rest and
+    // when scrolled to the very top.
+    final anchor = topInset <= 0.0
+        ? 0.0
+        : (topInset / MediaQuery.sizeOf(context).height).clamp(0.0, 1.0);
     final lastViewedNoteId = ref.watch(
       timelineLastViewedNoteIdNotifierProvider(tabSettings),
     );
@@ -368,6 +404,7 @@ class TimelineListView extends HookConsumerWidget {
     }, [tabSettings, centerId]);
 
     return HapticFeedbackRefreshIndicator(
+      indicatorKey: refreshKey,
       onRefresh: () => reloadTimeline(ref, tabSettings),
       notificationPredicate: (_) => isLatestLoaded,
       child: Stack(
@@ -376,7 +413,10 @@ class TimelineListView extends HookConsumerWidget {
           CustomScrollView(
             controller: nested ? null : controller,
             center: centerKey,
+            anchor: anchor,
             slivers: [
+              if (topInset > 0.0)
+                SliverToBoxAdapter(child: SizedBox(height: topInset)),
               SliverToBoxAdapter(
                 child: Center(
                   child: Container(

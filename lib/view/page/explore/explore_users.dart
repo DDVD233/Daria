@@ -7,6 +7,7 @@ import '../../../constant/max_content_width.dart';
 import '../../../i18n/strings.g.dart';
 import '../../../model/account.dart';
 import '../../../provider/api/users_notifier_provider.dart';
+import '../../../provider/tab_reselect_provider.dart';
 import '../../../util/punycode.dart';
 import '../../widget/misskey_server_autocomplete.dart';
 import '../../widget/paginated_list_view.dart';
@@ -16,10 +17,16 @@ import '../../widget/users_sort_type_widget.dart';
 enum _UserType { local, remote }
 
 class ExploreUsers extends HookConsumerWidget {
-  const ExploreUsers({super.key, required this.account, this.host});
+  const ExploreUsers({
+    super.key,
+    required this.account,
+    this.host,
+    this.topInset = 0.0,
+  });
 
   final Account account;
   final String? host;
+  final double topInset;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,6 +56,11 @@ class ExploreUsers extends HookConsumerWidget {
     };
 
     return PaginatedListView(
+      topInset: topInset,
+      // Only the Explore tab's own Users view (no fixed host) participates in
+      // the bottom-nav re-tap behaviour.
+      reselectAccount: this.host == null ? account : null,
+      reselectSlot: this.host == null ? ReselectSlot.exploreUsers : null,
       header: SliverList.list(
         children: [
           const SizedBox(height: 8.0),

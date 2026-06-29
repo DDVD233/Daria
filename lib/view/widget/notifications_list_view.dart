@@ -22,16 +22,22 @@ import '../../provider/streaming/web_socket_channel_provider.dart';
 import 'haptic_feedback_refresh_indicator.dart';
 import 'notification_widget.dart';
 import 'pagination_bottom_widget.dart';
+import 'tab_reselect.dart';
 
 class NotificationsListView extends HookConsumerWidget {
   const NotificationsListView({
     super.key,
     required this.account,
     this.controller,
+    this.reselectSlot,
   });
 
   final Account account;
   final ScrollController? controller;
+
+  /// When set, the list listens to [tabReselectProvider] for this slot and, on
+  /// re-tap of its owning tab, scrolls to the top or refreshes if already there.
+  final String? reselectSlot;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,6 +53,17 @@ class NotificationsListView extends HookConsumerWidget {
     );
     final i = ref.watch(iNotifierProvider(account)).value;
     final controller = this.controller ?? useScrollController();
+    final refreshKey = useMemoized(
+      () => GlobalKey<RefreshIndicatorState>(),
+      [],
+    );
+    listenTabReselect(
+      ref,
+      account: account,
+      slot: reselectSlot,
+      controller: controller,
+      refreshKey: refreshKey,
+    );
     final centerKey = useMemoized(() => GlobalKey(), []);
     final hasUnread = useState(false);
     final keepAnimation = useRef(true);
@@ -140,6 +157,7 @@ class NotificationsListView extends HookConsumerWidget {
     });
 
     return HapticFeedbackRefreshIndicator(
+      indicatorKey: refreshKey,
       onRefresh: () async {
         ref.invalidate(webSocketChannelProvider(account));
         nextNotifications.value = [];

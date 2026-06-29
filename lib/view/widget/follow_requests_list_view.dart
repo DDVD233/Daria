@@ -22,14 +22,23 @@ import 'acct_widget.dart';
 import 'follow_request_action_button.dart';
 import 'haptic_feedback_refresh_indicator.dart';
 import 'pagination_bottom_widget.dart';
+import 'tab_reselect.dart';
 import 'user_avatar.dart';
 import 'user_sheet.dart';
 import 'username_widget.dart';
 
 class FollowRequestsListView extends HookConsumerWidget {
-  const FollowRequestsListView({super.key, required this.account});
+  const FollowRequestsListView({
+    super.key,
+    required this.account,
+    this.reselectSlot,
+  });
 
   final Account account;
+
+  /// When set, the list listens to [tabReselectProvider] for this slot and, on
+  /// re-tap of its owning tab, scrolls to the top or refreshes if already there.
+  final String? reselectSlot;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,6 +50,17 @@ class FollowRequestsListView extends HookConsumerWidget {
       ),
     );
     final controller = useScrollController();
+    final refreshKey = useMemoized(
+      () => GlobalKey<RefreshIndicatorState>(),
+      [],
+    );
+    listenTabReselect(
+      ref,
+      account: account,
+      slot: reselectSlot,
+      controller: controller,
+      refreshKey: refreshKey,
+    );
     final centerKey = useMemoized(() => GlobalKey(), []);
     final hasUnread = useState(false);
     final keepAnimation = useRef(true);
@@ -143,6 +163,7 @@ class FollowRequestsListView extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     return HapticFeedbackRefreshIndicator(
+      indicatorKey: refreshKey,
       onRefresh: () async {
         ref.invalidate(webSocketChannelProvider(account));
         nextRequests.value = [];

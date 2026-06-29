@@ -6,15 +6,21 @@ import '../../../i18n/strings.g.dart';
 import '../../../model/account.dart';
 import '../../../provider/api/featured_notes_notifier_provider.dart';
 import '../../../provider/api/featured_polls_notifier_provider.dart';
+import '../../../provider/tab_reselect_provider.dart';
 import '../../widget/note_widget.dart';
 import '../../widget/paginated_list_view.dart';
 
 enum _NoteType { notes, polls }
 
 class ExploreFeatured extends HookConsumerWidget {
-  const ExploreFeatured({super.key, required this.account});
+  const ExploreFeatured({
+    super.key,
+    required this.account,
+    this.topInset = 0.0,
+  });
 
   final Account account;
+  final double topInset;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,6 +31,9 @@ class ExploreFeatured extends HookConsumerWidget {
     };
 
     return PaginatedListView(
+      topInset: topInset,
+      reselectAccount: account,
+      reselectSlot: ReselectSlot.exploreFeatured,
       header: SliverPadding(
         padding: const EdgeInsets.all(8.0),
         sliver: SliverToBoxAdapter(

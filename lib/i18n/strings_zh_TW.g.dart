@@ -62,6 +62,7 @@ class Translations$aria$zh_TW extends Translations$aria$en_US {
 	@override String get addTab => '添加標籤';
 	@override String get alwaysExpandCw => '始終展開敏感的媒體內容';
 	@override String get alwaysExpandLongNote => '始終展開長貼文';
+	@override String get autoHideBars => '捲動時隱藏頂部和底部欄';
 	@override String get boostWithAccount => '用此帳號轉發';
 	@override TextSpan followConfirm({required InlineSpan name}) => TextSpan(children: [
 		const TextSpan(text: '你真的要追隨'),

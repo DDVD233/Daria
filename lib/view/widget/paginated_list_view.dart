@@ -4,10 +4,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../constant/inifite_scroll_extent_threshold.dart';
 import '../../constant/max_content_width.dart';
+import '../../model/account.dart';
 import '../../model/pagination_state.dart';
 import '../../provider/general_settings_notifier_provider.dart';
 import 'haptic_feedback_refresh_indicator.dart';
 import 'pagination_bottom_widget.dart';
+import 'tab_reselect.dart';
 
 class PaginatedListView<T> extends HookConsumerWidget {
   const PaginatedListView({
@@ -21,10 +23,17 @@ class PaginatedListView<T> extends HookConsumerWidget {
     this.loadMore,
     this.panel = true,
     this.noItemsLabel,
+    this.reselectAccount,
+    this.reselectSlot,
+    this.topInset = 0.0,
   });
 
   final ScrollController? controller;
   final Widget? header;
+
+  /// Height of a scrollable spacer prepended at the top of the list, so content
+  /// scrolls out from under an overlaying, auto-hiding top bar.
+  final double topInset;
   final AsyncValue<PaginationState<T>>? paginationState;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final Widget? footer;
@@ -33,9 +42,29 @@ class PaginatedListView<T> extends HookConsumerWidget {
   final bool panel;
   final String? noItemsLabel;
 
+  /// When both are set, the list listens to [tabReselectProvider] for this
+  /// account/slot and, on re-tap of its owning tab, scrolls to the top or
+  /// refreshes (via [onRefresh]) if already there.
+  final Account? reselectAccount;
+  final String? reselectSlot;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = this.controller ?? useScrollController();
+    final refreshKey = useMemoized(
+      () => GlobalKey<RefreshIndicatorState>(),
+      [],
+    );
+    if (reselectAccount case final account?) {
+      listenTabReselect(
+        ref,
+        account: account,
+        slot: reselectSlot,
+        controller: controller,
+        refreshKey: refreshKey,
+        onRefresh: onRefresh,
+      );
+    }
     final isAtBottom = useState(false);
     useEffect(() {
       void callback() {
@@ -56,11 +85,14 @@ class PaginatedListView<T> extends HookConsumerWidget {
     }, [loadMore]);
 
     return HapticFeedbackRefreshIndicator(
+      indicatorKey: refreshKey,
       onRefresh: onRefresh ?? () async {},
       child: CustomScrollView(
         controller: controller,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          if (topInset > 0.0)
+            SliverToBoxAdapter(child: SizedBox(height: topInset)),
           if (header case final header?) header,
           if (paginationState case final paginationState?) ...[
             if (paginationState.value?.items case final items?

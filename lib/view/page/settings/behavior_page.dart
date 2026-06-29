@@ -103,6 +103,19 @@ class BehaviorPage extends HookConsumerWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 width: maxContentWidth,
                 child: SwitchListTile.adaptive(
+                  title: Text(t.aria.autoHideBars),
+                  value: settings.autoHideBars,
+                  onChanged: (value) => ref
+                      .read(generalSettingsNotifierProvider.notifier)
+                      .setAutoHideBars(value),
+                ),
+              ),
+            ),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                width: maxContentWidth,
+                child: SwitchListTile.adaptive(
                   title: Text(t.aria.openSensitiveMediaOnDoubleTap),
                   value: settings.openSensitiveMediaOnDoubleTap,
                   onChanged: (value) => ref

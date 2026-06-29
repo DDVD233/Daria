@@ -97,6 +97,9 @@ class Translations$aria$en_US {
 	/// en-US: 'Authenticated'
 	String get authenticated => 'Authenticated';
 
+	/// en-US: 'Hide top and bottom bars when scrolling'
+	String get autoHideBars => 'Hide top and bottom bars when scrolling';
+
 	/// en-US: 'Avatar size'
 	String get avatarSize => 'Avatar size';
 

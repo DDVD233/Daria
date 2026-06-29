@@ -67,6 +67,7 @@ class Translations$aria$zh_CN extends Translations$aria$en_US {
 	@override String get alwaysShowTabHeader => '总是显示标签页信息';
 	@override String get authenticate => '验证账户';
 	@override String get authenticated => '已认证';
+	@override String get autoHideBars => '滚动时隐藏顶部和底部栏';
 	@override String get avatarSize => '头像大小';
 	@override String get background => '背景';
 	@override String get boostWithAccount => '用此账号转发';

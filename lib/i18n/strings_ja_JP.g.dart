@@ -67,6 +67,7 @@ class Translations$aria$ja_JP extends Translations$aria$en_US {
 	@override String get alwaysShowTabHeader => 'タブの情報を常に表示する';
 	@override String get authenticate => '認証';
 	@override String get authenticated => '認証してきた';
+	@override String get autoHideBars => 'スクロール時に上下のバーを隠す';
 	@override String get avatarSize => 'アイコンのサイズ';
 	@override String get background => '背景';
 	@override String get boostWithAccount => 'このアカウントでリノート';

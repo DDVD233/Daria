@@ -9,11 +9,15 @@ import '../../provider/misskey_sfx_notifier_provider.dart';
 class HapticFeedbackRefreshIndicator extends HookConsumerWidget {
   const HapticFeedbackRefreshIndicator({
     super.key,
+    this.indicatorKey,
     required this.onRefresh,
     this.notificationPredicate = defaultScrollNotificationPredicate,
     required this.child,
   });
 
+  /// Forwarded to the underlying [RefreshIndicator] so callers can trigger a
+  /// refresh programmatically via `indicatorKey.currentState?.show()`.
+  final GlobalKey<RefreshIndicatorState>? indicatorKey;
   final Future<void> Function() onRefresh;
   final bool Function(ScrollNotification notification) notificationPredicate;
   final Widget child;
@@ -30,6 +34,7 @@ class HapticFeedbackRefreshIndicator extends HookConsumerWidget {
     final armed = useState(false);
 
     return RefreshIndicator(
+      key: indicatorKey,
       onRefresh: () async {
         await onRefresh();
         ref
