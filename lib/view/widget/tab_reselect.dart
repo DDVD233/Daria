@@ -24,7 +24,9 @@ void listenTabReselect(
 }) {
   if (slot == null) return;
   ref.listen(tabReselectProvider(account, slot), (_, _) {
-    if (controller.hasClients && controller.position.extentBefore > 0.0) {
+    // Treat "within a few px of the top" as already-at-top so the second tap
+    // refreshes; a center-anchored timeline can rest a hair above 0.
+    if (controller.hasClients && controller.position.extentBefore > 8.0) {
       unawaited(controller.scrollToTop());
     } else if (refreshKey?.currentState case final state?) {
       unawaited(state.show());

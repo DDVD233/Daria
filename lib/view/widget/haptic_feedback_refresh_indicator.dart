@@ -12,6 +12,7 @@ class HapticFeedbackRefreshIndicator extends HookConsumerWidget {
     this.indicatorKey,
     required this.onRefresh,
     this.notificationPredicate = defaultScrollNotificationPredicate,
+    this.edgeOffset = 0.0,
     required this.child,
   });
 
@@ -20,6 +21,10 @@ class HapticFeedbackRefreshIndicator extends HookConsumerWidget {
   final GlobalKey<RefreshIndicatorState>? indicatorKey;
   final Future<void> Function() onRefresh;
   final bool Function(ScrollNotification notification) notificationPredicate;
+
+  /// Distance from the top at which the spinner appears. Set to the height of an
+  /// overlaying top bar so the indicator shows below it instead of behind it.
+  final double edgeOffset;
   final Widget child;
 
   @override
@@ -35,6 +40,7 @@ class HapticFeedbackRefreshIndicator extends HookConsumerWidget {
 
     return RefreshIndicator(
       key: indicatorKey,
+      edgeOffset: edgeOffset,
       onRefresh: () async {
         await onRefresh();
         ref

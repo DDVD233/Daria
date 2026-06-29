@@ -86,6 +86,7 @@ class PaginatedListView<T> extends HookConsumerWidget {
 
     return HapticFeedbackRefreshIndicator(
       indicatorKey: refreshKey,
+      edgeOffset: topInset,
       onRefresh: onRefresh ?? () async {},
       child: CustomScrollView(
         controller: controller,

@@ -405,6 +405,7 @@ class TimelineListView extends HookConsumerWidget {
 
     return HapticFeedbackRefreshIndicator(
       indicatorKey: refreshKey,
+      edgeOffset: topInset,
       onRefresh: () => reloadTimeline(ref, tabSettings),
       notificationPredicate: (_) => isLatestLoaded,
       child: Stack(
