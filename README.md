@@ -16,9 +16,10 @@ number of complementary server-side changes.
 
 | Android       | iOS | Windows | macOS | Linux |
 | ------------- | --- | ------- | ----- | ----- |
-| [APK][GitHub] |     |         |       |       |
+| [APK][GitHub] | [Testflight][Testflight]    |         |       |       |
 
 [GitHub]: https://github.com/DDVD233/Daria/releases/latest
+[Testflight]: https://testflight.apple.com/join/esVXdTJz
 
 ## Icon
 
